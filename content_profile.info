@@ -1,0 +1,5 @@
+; $Id$
+name = "Content Profile"
+description = "Use content types for user profiles."
+package = "Content Profile"
+core = 6.x

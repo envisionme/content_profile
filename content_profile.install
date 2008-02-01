@@ -1,0 +1,43 @@
+<?php
+// $Id$
+
+/**
+ * Implementation of hook_enable()
+ */
+function content_profile_enable() {
+  //enable the default content type 'profile' to te a content profile
+  if (!variable_get('content_profile_profile', FALSE)) {
+    variable_set('content_profile_profile', array());
+  }
+}
+
+/**
+ * Implementation of hook_install()
+ */
+function content_profile_install() {
+  // Set the module weight to -1, so content_profile_user() gets called before
+  // node_user(), so that one can't set a node's uid to 0 on user deletion
+  // before the profile nodes are deleted.
+  db_query("UPDATE {system} SET weight = -1 WHERE name = 'content_profile'");
+}
+
+/**
+ * Implementation of hook_uninstall()
+ */
+function content_profile_uninstall() {
+  foreach (node_get_types('names') as $typename => $visiblename) {
+    if (variable_get('content_profile_'. $typename, 0)) {
+      variable_del('content_profile_'. $typename);
+    }
+  }
+  variable_del('content_profile_settings');
+}
+
+/**
+ * Set module weight to -1, as explained in content_profile_install().
+ */
+function content_profile_update_6001() {
+  $ret = array();
+  $ret[] = update_sql("UPDATE {system} SET weight = -1 WHERE name = 'content_profile'");
+  return $ret;
+}
