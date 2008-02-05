@@ -170,7 +170,7 @@ function content_profile_form_alter(&$form, $form_state, $form_id) {
     );
     $form['content_profile']['content_profile'] = array(
       '#type' => 'checkbox',
-      '#title' => t('Use this content type as a content_profile for users'),
+      '#title' => t('Use this content type as a content profile for users'),
       '#default_value' => is_content_profile($form['#node_type']->type),
       '#return_value' => array(),
     );
