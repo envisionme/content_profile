@@ -289,7 +289,7 @@ function content_profile_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
   else if ($op == 'validate' && is_content_profile($node) && user_access('administer nodes') && !isset($node->nid)) {
     //check whether the selected user has already a profile
     $uid = db_result(db_query("SELECT uid FROM {users} WHERE name = '%s'", $node->name));
-    if (content_profile_profile_exists($node, $node->uid)) {
+    if (content_profile_profile_exists($node, $uid)) {
       form_set_error('name', t('This user has already a content profile of this type. You can only create one profile per user.'));
     }
   }
