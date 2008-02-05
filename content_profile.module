@@ -14,11 +14,11 @@ function content_profile_menu() {
 
   //Register a path for each content profile type
   foreach (content_profile_get_types('names') as $type => $typename) {
-    $items['admin/content/types/'. str_replace('_', '-', $type) .'/edit'] = array(
+    $items['admin/content/node-type/'. str_replace('_', '-', $type) .'/edit'] = array(
       'title' => 'Edit',
       'type' => MENU_DEFAULT_LOCAL_TASK,
     );
-    $items['admin/content/types/'. str_replace('_', '-', $type) .'/profile'] = array(
+    $items['admin/content/node-type/'. str_replace('_', '-', $type) .'/profile'] = array(
       'title' => 'Content profile',
       'description' => 'Configure the display and management of this content profile.',
       'page callback' => 'drupal_get_form',
@@ -164,7 +164,7 @@ function content_profile_form_alter(&$form, $form_state, $form_id) {
   if ($form_id == 'node_type_form') {
     $form['content_profile'] = array(
       '#type' => 'fieldset',
-      '#title' => t('Node Profile'),
+      '#title' => t('Content Profile'),
       '#collapsible' => TRUE,
       '#weight' => 32,
     );
@@ -304,7 +304,7 @@ function content_profile_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
  * 
  * @param $node The node, which is to be created
  * @param $uid The user to check for
- * @return $nid If a node exists, the node id, FALSE else.
+ * @return If a node exists, the node id, FALSE else.
  */
 function content_profile_profile_exists($node, $uid) {
   $query = "SELECT n.nid AS nid FROM {node} n WHERE n.type = '%s' AND n.uid = %d ";
