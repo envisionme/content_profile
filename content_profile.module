@@ -36,14 +36,14 @@ function content_profile_menu() {
  * Implementation of hook_node_info()
  */
 function content_profile_node_info() {
-  return array('profile' => array(
-    'name' => t('Profile'),
-    'has_title' => TRUE,
-    'has_body' => TRUE,
-    'custom' => TRUE,
-    'modified' => TRUE,
-    'locked' => FALSE,
-  ));
+  return array(
+    'profile' => array(
+      'name' => t('Profile'),
+      'module' => 'node',
+      'description' => t('A user profile built as content.'),
+      'locked' => FALSE,
+    ),
+  );
 }
 
 /**
@@ -189,32 +189,12 @@ function content_profile_user($op, &$edit, &$account, $category = NULL) {
       break;
 
     case 'delete':
-      // retrieve profile node types to be deleted
-      $typenames = array();
-      foreach (node_get_types('names') as $typename => $visiblename) {
-        if (is_content_profile($typename)) {
-          $typenames[] = $typename;
-          //$typenames = array_merge($typenames, nodefamily_get_descendant_types($typename));
-        }
-      }
+      // Retrieve all profile nodes (in any language) for this user by issueing an SQL query.
+      if ($types = content_profile_get_types()) {
+        $condition = array_fill(0, count($types), "type = '%s'");
+        $arguments = array_merge(array_keys($types), array($account->uid));
 
-      // Retrieve the matching profile nodes for this user by issueing an SQL
-      // query. node_load() doesn't work, because its own query still requires
-      // the user to be in the {user} table, which is not the case anymore.
-      // That node_load() doesn't work also means that node_delete() doesn't
-      // work, which is why we have to use _content_profile_node_delete() instead.
-      $cond = array();
-      $arguments = array();
-
-      foreach (content_profile_get_types() as $type => $type_info) {
-        $cond[] = "type = '%s'";
-        $arguments[] = $type;
-      }
-      $cond = implode(' OR ', $cond);
-      $arguments[] = $account->uid;
-
-      if ($cond) {
-        $result = db_query("SELECT * FROM {node} WHERE (". $cond .") AND uid = %d", $arguments);
+        $result = db_query("SELECT * FROM {node} WHERE (". implode(', ', $condition) .") AND uid = %d", $arguments);
         while ($node = db_fetch_object($result)) {
           _content_profile_node_delete($node);
         }
@@ -234,7 +214,6 @@ function content_profile_user($op, &$edit, &$account, $category = NULL) {
  * "SELECT * FROM {node}" query) instead of just the $nid.
  */
 function _content_profile_node_delete($node) {
-
   // Copied over from node_load(), so that node_invoke('delete') gets
   // the fully extended node object, like modules would expect:
 
@@ -269,8 +248,8 @@ function _content_profile_node_delete($node) {
   if (function_exists('search_wipe')) {
     search_wipe($node->nid, 'node');
   }
-  drupal_set_message(t('%title has been deleted.', array('%title' => $node->title)));
-  watchdog('content', '@type: deleted %title.', array('@type' => node_get_types('name', $node->type), '%title' => $node->title));
+  watchdog('content', '@type: deleted %title.', array('@type' => $node->type, '%title' => $node->title));
+  drupal_set_message(t('@type %title has been deleted.', array('@type' => node_get_types('name', $node), '%title' => $node->title)));
 }
 
 /**
