@@ -301,7 +301,7 @@ function content_profile_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
 
 /**
  * Checks whether a node of this type exists already for the author
- * 
+ *
  * @param $node The node, which is to be created
  * @param $uid The user to check for
  * @return If a node exists, the node id, FALSE else.
@@ -429,4 +429,13 @@ function content_profile_theme() {
       'file' => 'content_profile.theme.inc',
     ),
   );
+}
+
+/**
+ * Implementation of hook_simpletest()
+ */
+function content_profile_simpletest() {
+  // Scan through content_profile/tests directory for any .test files to tell SimpleTest module.
+  $tests = file_scan_directory(drupal_get_path('module', 'content_profile') .'/tests', '\.test');
+  return array_keys($tests);
 }
