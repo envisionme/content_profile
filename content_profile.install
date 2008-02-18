@@ -6,7 +6,8 @@
  */
 function content_profile_enable() {
   //enable the default content type 'profile' to te a content profile
-  if (!variable_get('content_profile_profile', FALSE)) {
+  $setting = variable_get('content_profile_profile', FALSE);
+  if (!$setting && $setting !== array()) {
     variable_set('content_profile_profile', array());
   }
 }
@@ -19,6 +20,32 @@ function content_profile_install() {
   // node_user(), so that one can't set a node's uid to 0 on user deletion
   // before the profile nodes are deleted.
   db_query("UPDATE {system} SET weight = -1 WHERE name = 'content_profile'");
+  
+  content_profile_import();
+}
+
+/**
+ * Import settings from nodeprofile / bio
+ */
+function content_profile_import() {
+  //nodeprofile
+  if ($settings = variable_get('nodeprofile_settings', array())) {
+    $cp_setting = array();
+    foreach ($settings as $setting => $data) {
+      foreach ($data as $type => $value) {
+        $cp_settings[$type][$setting] = $value;
+      }
+    }
+    foreach ($cp_settings as $type => $data) {
+      variable_set('content_profile_'. $type, $data);
+    }
+    variable_del('nodeprofile_settings');
+  }
+  //bio
+  if ($type = variable_get('bio_nodetype', FALSE)) {
+    variable_set('content_profile_'. $type, array());
+    variable_del('bio_nodetype');
+  }
 }
 
 /**

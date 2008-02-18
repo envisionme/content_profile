@@ -311,7 +311,6 @@ function content_profile_get_settings($type, $return = 'all') {
  * Saves the content_profile settings of a content type
  */
 function content_profile_set_settings($type, $settings) {
-  //cleanup the settings before saving
   variable_set('content_profile_'. $type, $settings);
 }
 
