@@ -369,7 +369,7 @@ function content_profile_show_profiles($uid) {
         '#suffix' => '<br />',
       );
     }
-    else if ($uid == $user->uid && user_access('create '. $type .' content') && content_profile_get_settings($type, 'add_link')) {
+    else if ($uid == $user->uid && user_access('create '. $type .' content') && content_profile_get_settings($type, 'add_link') && !$node) {
       $content['content_profile_'. $type] = array(
         '#theme' => 'content_profile_display_add_link',
         '#uid' => $uid,
