@@ -32,19 +32,6 @@ function content_profile_menu() {
   return $items;
 }
 
-/**
- * Implementation of hook_node_info()
- */
-function content_profile_node_info() {
-  return array(
-    'profile' => array(
-      'name' => t('Profile'),
-      'module' => 'node',
-      'description' => t('A user profile built as content.'),
-      'locked' => FALSE,
-    ),
-  );
-}
 
 /**
  * Menu callback; content profile settings.
