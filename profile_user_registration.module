@@ -1,0 +1,174 @@
+<?php // $Id$
+/**
+ * @file
+ * Allows exposure and processing of content_profile node fields at user registration
+ */
+
+/**
+ * Implementation of hook_menu().
+ */
+function profile_user_registration_menu() {
+  $items = array();
+
+  $items['admin/settings/profile_user_registration'] = array(
+    'title' => 'Content Profile User Registration',
+    'description' => 'Configure how content profile is exposed during the user registration process',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('profile_user_registration_admin_settings'),
+    'access arguments' => array('administer nodes'),
+  );
+
+  return $items;
+}
+
+function profile_user_registration_admin_settings() {
+  $form['profile_user_registration_fieldset_name'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Top-level fieldset name'),
+    '#description' => t('This is the name that will be displayed on the top-level fieldset.'),
+    '#default_value' => variable_get('profile_user_registration_fieldset_name', t('Profile')),
+  );
+  
+  $form['profile_user_registration_use_fieldset'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Use fieldset for each node type'),
+    '#description' => t('If checked each set of node type fields will be grouped into their own fieldset. If unchecked all fields will be grouped into one fieldset as named above. Regardless of the setting there will always be a overall fieldset to house all of the fields.'),
+    '#default_value' => variable_get('profile_user_registration_use_fieldset', 0),
+  );
+  
+  $fields = array();
+  foreach (content_profile_get_types('names') as $type => $typename) {
+    // build up list of fields
+    $type_fields = _profile_user_registration_get_fields($type);
+    foreach($type_fields as $fieldname => $info) {
+      // skip required fields (they are forced)
+      if (!$info['required']) {
+        $fields[$type.':'.$fieldname] = $type.': '.$info['widget']['label'];
+      }
+    }
+  }
+  
+  if (!empty($fields)) {
+    $form['profile_user_registration_display_fields'] = array(
+      '#type' => 'select',
+      '#multiple' => TRUE,
+      '#title' => t('Show following fields on user registration'),
+      '#description' => t('Fields selected here will show up on the user registration form. Required fields will always show up.'),
+      '#options' => $fields,
+      '#default_value' => variable_get('profile_user_registration_display_fields', array()),
+    );
+  }
+    
+  return system_settings_form($form);
+}
+
+function profile_user_registration_form_alter(&$form, $form_state, $form_id) {
+  module_load_include('inc', 'content', 'includes/content.node_form');
+  if ($form_id == 'user_register' && module_exists('content')) {
+    $widget_types = _content_widget_types();
+    $display_fields = variable_get('profile_user_registration_display_fields', array());
+    $usefieldset = variable_get('profile_user_registration_use_fieldset', 0);
+    
+    if (!empty($display_fields) || _profile_user_registration_required_fields()) {
+    
+      $form['profile_user_registration'] = array(
+        '#type' => 'fieldset',
+        '#title' => variable_get('profile_user_registration_fieldset_name', t('Profile')),
+      );
+    
+    
+      foreach (content_profile_get_types('names') as $type => $typename) {
+        $elements = array();
+    
+        $node = new stdClass();
+        $node->type = $type;
+      
+        $fields = _profile_user_registration_get_fields($type);
+      
+        foreach ($fields as $field_name => $field) {
+          if ($field['required'] || in_array($type.':'.$field_name, $display_fields)) {
+            $cck_field = content_field_form($form, $form_state, $field);
+            $elements = array_merge($elements, $cck_field);
+          }
+        }
+      
+        if ($usefieldset && !empty($elements)) {
+          if (!isset($form['profile_user_registration'][$type])) {
+            $form['profile_user_registration'][$type] = array(
+              '#type' => 'fieldset',
+              '#title' => $typename
+            );
+          }
+          $form['profile_user_registration'][$type] = array_merge($form['profile_user_registration'][$type], $elements);
+        }
+        else {
+          $form['profile_user_registration'] = array_merge($form['profile_user_registration'], $elements);
+        }
+      }
+    
+      $form['#submit'][] = 'profile_user_registration_user_register_submit';
+      $form['#validate'][] = 'profile_user_registration_user_register_validate';
+    
+    }
+  }
+}
+
+function _profile_user_registration_get_fields($type) {
+   $typeinfo = content_types($type);
+   return $typeinfo['fields'];
+}
+
+function _profile_user_registration_required_fields() {
+  foreach (content_profile_get_types('names') as $type => $typename) {
+    $fields = _profile_user_registration_get_fields($type);
+    foreach ($fields as $field_name => $field) {
+      if ($field['required']) {
+        return TRUE;
+      }
+    }
+  }
+  return FALSE;
+}
+
+function profile_user_registration_user_register_submit($form, $form_state) {
+  require_once drupal_get_path('module', 'node') .'/node.pages.inc';
+  foreach (content_profile_get_types('names') as $type => $typename) {
+    $node = new StdClass;
+    $node->type = $type;
+    $node->uid = $form_state['user']->uid;
+    $node->title = $form_state['values']['name'];
+    $node->name = $form_state['values']['name'];
+    
+    // review the CCK API to see if there is a builtin for this foreach() functionality
+    foreach ($form_state['values'] as $field_name => $value) {
+      if (preg_match('/^field_/', $field_name)) {
+        $node->$field_name = $form_state['values'][$field_name];
+      }
+    }
+    // Create the node.
+    $node = node_submit($node);
+    module_invoke_all('submit', $node);
+    module_invoke_all('nodeapi', $node, 'submit', NULL, NULL);
+    node_save($node);
+    // Give us a nice log message.
+    if ($node->nid) {
+      watchdog('content', t('Content Profile: added %user %type upon registration.', array('%user' => $node->name, '%type' => $type)), WATCHDOG_NOTICE, l(t('view'), "node/$node->nid"));
+    }
+  }
+}
+
+function profile_user_registration_user_register_validate($form_id, $form_values) {
+  // Create a dummy node to pass along to CCK.
+  $node = new stdClass();
+  foreach ($form_values as $field_name => $value) {
+    if (preg_match('/^field_/', $field_name)) {
+      $node->$field_name = $form_values[$field_name];
+    }
+  }
+  
+  // is proper node->type setting necessary for content_validate() to function properly?
+  foreach (content_profile_get_types('names') as $type => $typename) {
+    $node->type = $type;
+    content_validate($node);  
+  }
+}
