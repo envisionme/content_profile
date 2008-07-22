@@ -1,0 +1,82 @@
+<?php
+// $Id$
+
+/**
+ * @file content_profile.views.inc
+ * Provides support for the Views module.
+ *
+ * This implementation is almost entirely based around a relationship
+ * which is stapled to the 'node' table via hook_views_data_alter.
+ */
+
+/**
+ * Implementation of hook_views_data_alter().
+ */
+function content_profile_views_data_alter(&$data) {
+  // queue relationship
+  $data['users']['content_profile_rel'] = array(
+    'group' => t('Node'),
+    'title' => t('Content Profile'),
+    'help' => t('Create a relationship to a content profile of the user.'),
+    'relationship' => array(
+      'handler' => 'content_profile_views_handler_relationship',
+      'base' => 'node',
+      'base field' => 'uid',
+      'label' => t('Content Profile'),
+    ),
+  );
+}
+
+/**
+ * Specialized relationship handler to add nodequeues.
+ */
+class content_profile_views_handler_relationship extends views_handler_relationship {
+  function options(&$options) {
+    parent::options($options);
+
+    $options['type'] = '';
+  }
+
+  /**
+   * Default options form that provides the label widget that all fields
+   * should have.
+   */
+  function options_form(&$form, &$form_state) {
+    parent::options_form($form, $form_state);
+
+    $form['type'] = array(
+      '#type' => 'radios',
+      '#title' => t('Content type'),
+      '#default_value'=> $this->options['type'],
+      '#options' => content_profile_get_types('names'),
+      '#required' => TRUE,
+    );
+  }
+
+  /**
+   * Called to implement a relationship in a query.
+   */
+  function query() {
+    // Figure out what base table this relationship brings to the party.
+    $join = new views_join();
+    $join->definition = array(
+      'table' => 'node',
+      'field' => 'uid',
+      'left_table' => 'users',
+      'left_field' => 'uid',
+      'extra' => array(
+        array('field' => 'type', 'value' => $this->options['type']),
+      ),
+    );
+
+    if (!empty($this->options['required'])) {
+      $join->definition['type'] = 'INNER';
+    }
+
+    $join->construct();
+    $this->ensure_my_table();
+
+    $alias = $join->definition['table'] . '_' . $join->definition['left_table'];
+    $this->alias = $this->query->add_relationship($alias, $join, $this->definition['base'], $this->relationship);
+  }
+}
