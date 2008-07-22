@@ -4,16 +4,13 @@
 /**
  * @file content_profile.views.inc
  * Provides support for the Views module.
- *
- * This implementation is almost entirely based around a relationship
- * which is stapled to the 'node' table via hook_views_data_alter.
  */
 
 /**
  * Implementation of hook_views_data_alter().
  */
 function content_profile_views_data_alter(&$data) {
-  // queue relationship
+  // node relationship for profiles
   $data['users']['content_profile_rel'] = array(
     'group' => t('Node'),
     'title' => t('Content Profile'),
@@ -28,7 +25,7 @@ function content_profile_views_data_alter(&$data) {
 }
 
 /**
- * Specialized relationship handler to add nodequeues.
+ * Specialized relationship handler to adding content profiles.
  */
 class content_profile_views_handler_relationship extends views_handler_relationship {
   function options(&$options) {
@@ -38,8 +35,7 @@ class content_profile_views_handler_relationship extends views_handler_relations
   }
 
   /**
-   * Default options form that provides the label widget that all fields
-   * should have.
+   * Adds a form element for choosing the right content type.
    */
   function options_form(&$form, &$form_state) {
     parent::options_form($form, $form_state);
