@@ -3,7 +3,7 @@ name = "Content Profile User Registration"
 description = "Enable content profile features during user registration"
 package = "Content Profile"
 core = 6.x
-dependencies[] = content_profile
+dependencies[] = content_profile content
 
 core = "6.x"
 
