@@ -43,7 +43,7 @@ class content_profile_views_handler_relationship extends views_handler_relations
     $form['type'] = array(
       '#type' => 'radios',
       '#title' => t('Content type'),
-      '#default_value'=> $this->options['type'],
+      '#default_value' => $this->options['type'],
       '#options' => content_profile_get_types('names'),
       '#required' => TRUE,
     );
@@ -72,7 +72,7 @@ class content_profile_views_handler_relationship extends views_handler_relations
     $join->construct();
     $this->ensure_my_table();
 
-    $alias = $join->definition['table'] . '_' . $join->definition['left_table'];
+    $alias = $join->definition['table'] .'_'. $join->definition['left_table'];
     $this->alias = $this->query->add_relationship($alias, $join, $this->definition['base'], $this->relationship);
   }
 }

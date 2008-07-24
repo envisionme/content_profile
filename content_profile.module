@@ -3,7 +3,7 @@
 
 /**
  * @file
- * Marks content types as profiles
+ * Marks content types as profiles.
  */
 
 /**
@@ -93,7 +93,8 @@ function content_profile_admin_settings_submit($form, &$form_state) {
 
 /**
  * Determine if a given node is a content_profile.
- * @param $type The node object or the node's type
+ * @param $type
+ *   The node object or the node's type
  */
 function is_content_profile($type) {
   if (is_object($type)) {
@@ -106,11 +107,12 @@ function is_content_profile($type) {
  * Builds a list of available content types that are marked as content_profiles,
  * and returns an array of content profile content types in the specified format.
  *
- * @param $op When set to 'types', content profile content types are returned
- *            as type objects. When set to 'names', only their type names
- *            are returned.
- * @param $setting If set, only content types that have this setting activated are
- *            returned. Leave it NULL to get all content profile types.
+ * @param $op
+ *   When set to 'types', content profile content types are returned
+ *   as type objects. When set to 'names', only their type names are returned.
+ * @param $setting
+ *   If set, only content types that have this setting activated are returned.
+ *   Leave it NULL to get all content profile types.
  */
 function content_profile_get_types($op = 'types', $setting = NULL) {
   $types = array();
@@ -124,7 +126,7 @@ function content_profile_get_types($op = 'types', $setting = NULL) {
 }
 
 /**
- * Implementation of hook_node_type():
+ * Implementation of hook_node_type().
  * Rename or delete the settings variable if a type changes.
  */
 function content_profile_node_type($op, $info) {
@@ -165,7 +167,7 @@ function content_profile_form_alter(&$form, $form_state, $form_id) {
 }
 
 /**
- * Implementation of hook_user():
+ * Implementation of hook_user().
  */
 function content_profile_user($op, &$edit, &$account, $category = NULL) {
   global $user;
@@ -252,14 +254,14 @@ function content_profile_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
       drupal_goto('node/'. $nid .'/edit', 'destination=user/'. $node->uid);
     }
   }
-  else if ($op == 'validate' && is_content_profile($node) && user_access('administer nodes') && !isset($node->nid)) {
+  elseif ($op == 'validate' && is_content_profile($node) && user_access('administer nodes') && !isset($node->nid)) {
     //check whether the selected user has already a profile
     $uid = db_result(db_query("SELECT uid FROM {users} WHERE name = '%s'", $node->name));
     if (content_profile_profile_exists($node, $uid)) {
       form_set_error('name', t('This user has already a content profile of this type. You can only create one profile per user.'));
     }
   }
-  else if ($op == 'alter' && is_content_profile($node->type) && isset($last_nid)) {
+  elseif ($op == 'alter' && is_content_profile($node->type) && isset($last_nid)) {
     // Index themed node
     $node->body = theme('node', $node, FALSE, TRUE); //TODO: check if still necessary and if it needs to be ported to 6.x
   }
@@ -268,8 +270,10 @@ function content_profile_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
 /**
  * Checks whether a node of this type exists already for the author
  *
- * @param $node The node, which is to be created
- * @param $uid The user to check for
+ * @param $node
+ *   The node, which is to be created.
+ * @param $uid
+ *   The user to check for.
  * @return If a node exists, the node id, FALSE else.
  */
 function content_profile_profile_exists($node, $uid) {
@@ -281,9 +285,12 @@ function content_profile_profile_exists($node, $uid) {
 }
 
 /**
- * Returns the content_profiles' settings
- * @param $type The content type to return settings for
- * @param $return 'all' or one of the content_profile_available_settings(), e.g. user_edit, register or weight
+ * Returns the content_profiles' settings.
+ * @param $type
+ *   The content type to return settings for.
+ * @param $return
+ *   'all' or one of the content_profile_available_settings(),
+ *   e.g. user_edit, register or weight.
  */
 function content_profile_get_settings($type, $return = 'all') {
   $settings = variable_get('content_profile_'. $type, array());
@@ -295,23 +302,24 @@ function content_profile_get_settings($type, $return = 'all') {
 }
 
 /**
- * Saves the content_profile settings of a content type
+ * Saves the content_profile settings of a content type.
  */
 function content_profile_set_settings($type, $settings) {
   variable_set('content_profile_'. $type, $settings);
 }
 
 /**
- * Returns an array, which defines the default value for each
- * available setting
+ * Returns an array, which defines the available settings
+ * and their default value.
  */
 function content_profile_settings_info() {
   return module_invoke_all('content_profile_settings');
 }
 
 /**
- * Implementation of hook_content_profile_settings()
- * Defines content profile settings and their default value
+ * Implementation of hook_content_profile_settings().
+ *
+ * Defines content profile settings and their default value.
  */
 function content_profile_content_profile_settings() {
   return array(
@@ -323,7 +331,7 @@ function content_profile_content_profile_settings() {
 }
 
 /**
- * Loads the node, like node_load but caches the results
+ * Loads the node, like node_load but caches the results.
  */
 function content_profile_load($type, $uid) {
   static $cache = array();
@@ -336,7 +344,7 @@ function content_profile_load($type, $uid) {
 
 /**
  * Returns an array suitable for use with drupal_render,
- * that shows all content_profiles as configured by the admin
+ * that shows all content_profiles as configured by the admin.
  */
 function content_profile_show_profiles($uid) {
   global $user;
@@ -356,7 +364,7 @@ function content_profile_show_profiles($uid) {
         '#suffix' => '<br />',
       );
     }
-    else if ($uid == $user->uid && user_access('create '. $type .' content') && content_profile_get_settings($type, 'add_link') && !$node) {
+    elseif ($uid == $user->uid && user_access('create '. $type .' content') && content_profile_get_settings($type, 'add_link') && !$node) {
       $content['content_profile_'. $type] = array(
         '#theme' => 'content_profile_display_add_link',
         '#uid' => $uid,
@@ -372,7 +380,7 @@ function content_profile_show_profiles($uid) {
 }
 
 /**
- * Implementation of hook_theme()
+ * Implementation of hook_theme().
  */
 function content_profile_theme() {
   return array(
@@ -397,7 +405,7 @@ function content_profile_theme() {
 }
 
 /**
- * Implementation of hook_simpletest()
+ * Implementation of hook_simpletest().
  */
 function content_profile_simpletest() {
   // Scan through content_profile/tests directory for any .test files to tell SimpleTest module.

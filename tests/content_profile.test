@@ -1,5 +1,10 @@
 <?php
-//$Id
+// $Id$
+
+/**
+ * @file
+ * Some basic tests for content profile.
+ */
 
 class ContentProfileTest extends DrupalTestCase {
   function get_info() {

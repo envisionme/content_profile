@@ -89,7 +89,7 @@ function content_profile_get_add_path($type) {
 
 /**
  * Default path handler for content profile, which uses the default system paths
- * 
+ *
  * @param $action 'add' or 'edit
  * @param $arg For 'add' the content type, for 'edit' the node to be edited
  */
@@ -98,6 +98,6 @@ function content_profile_default_path_hanlder($action, $arg) {
     case 'add':
       return 'node/add/'. $arg;
     case 'edit':
-      return 'node/'. $arg->nid .'/edit';      
+      return 'node/'. $arg->nid .'/edit';
   }
 }
