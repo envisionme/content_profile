@@ -1,4 +1,6 @@
-  <?php // $Id$
+<?php
+// $Id$
+
 /**
  * @file
  * Allows exposure and processing of content_profile node fields at user registration
@@ -8,7 +10,7 @@ function content_profile_registration_form_alter(&$form, $form_state, $form_id) 
   module_load_include('inc', 'content', 'includes/content.node_form');
   if ($form_id == 'user_register' && module_exists('content')) {
     $widget_types = _content_widget_types();
-    
+
     foreach (content_profile_get_types('names') as $type => $typename) {
       $use = variable_get('content_profile_registration_use'. $type, TRUE);
       if ($use) {
@@ -42,7 +44,7 @@ function content_profile_registration_form_alter(&$form, $form_state, $form_id) 
         }
       }
     }
-  
+
     $form['#submit'][] = 'content_profile_registration_user_register_submit';
     $form['#validate'][] = 'content_profile_registration_user_register_validate';
   }
@@ -62,7 +64,7 @@ function content_profile_registration_form_alter(&$form, $form_state, $form_id) 
         '#description' => t('Use this content type on the user registration page'),
         '#default_value' => variable_get('content_profile_registration_use_'. $type, TRUE),
       );
-    
+
       $fields = variable_get('content_profile_registration_display_'. $type, FALSE);
       if ($fields === FALSE) {
         // user hasn't set any fields let's default to all required fields
@@ -80,7 +82,7 @@ function content_profile_registration_form_alter(&$form, $form_state, $form_id) 
       );
     }
     $form['#submit'][] = 'content_profile_registration_admin_settings_submit';
-    
+
   }
 }
 
@@ -135,7 +137,7 @@ function content_profile_registration_user_register_submit($form, $form_state) {
     $node->uid = $form_state['user']->uid;
     $node->title = $form_state['values']['name'];
     $node->name = $form_state['values']['name'];
-    
+
     // review the CCK API to see if there is a builtin for this foreach() functionality
     foreach ($form_state['values'] as $field_name => $value) {
       if (preg_match('/^field_/', $field_name)) {
@@ -162,10 +164,10 @@ function content_profile_registration_user_register_validate($form_id, $form_val
       $node->$field_name = $form_values[$field_name];
     }
   }
-  
+
   // is proper node->type setting necessary for content_validate() to function properly?
   foreach (content_profile_get_types('names') as $type => $typename) {
     $node->type = $type;
-    content_validate($node);  
+    content_validate($node);
   }
 }
