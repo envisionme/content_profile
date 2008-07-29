@@ -7,8 +7,8 @@
  */
 
 function content_profile_registration_form_alter(&$form, $form_state, $form_id) {
-  module_load_include('inc', 'content', 'includes/content.node_form');
   if ($form_id == 'user_register' && module_exists('content')) {
+    module_load_include('inc', 'content', 'includes/content.node_form');
     $widget_types = _content_widget_types();
 
     foreach (content_profile_get_types('names') as $type => $typename) {
