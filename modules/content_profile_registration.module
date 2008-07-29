@@ -6,6 +6,9 @@
  * Allows exposure and processing of content_profile node fields at user registration
  */
 
+/**
+ * Implementation of hook_form_alter().
+ */
 function content_profile_registration_form_alter(&$form, $form_state, $form_id) {
   if ($form_id == 'user_register' && module_exists('content')) {
     module_load_include('inc', 'content', 'includes/content.node_form');
@@ -86,14 +89,24 @@ function content_profile_registration_form_alter(&$form, $form_state, $form_id) 
   }
 }
 
+/**
+ * helper function to return all available fields for a particular content type
+ * 
+ * @param string $type a content type to return fields for
+ * @return array associated fields for the given content type
+ */
+
 function _content_profile_registration_get_fields($type) {
    $typeinfo = content_types($type);
    return $typeinfo['fields'];
 }
 
-/*
- returns an array suitable for use in a select field
- if $required is true only required fields fields will be returned if $required is FALSE all fields will be returned
+/**
+ * returns an array suitable for use in a select field
+ *
+ * @param string $type a content type to get the select elements for 
+ * @param bool $required if $required is true only required fields fields will be returned if $required is FALSE all fields will be returned
+ * @return array an array suitable for use in a select field
 */
 function _content_profile_registration_get_field_select($type, $required=FALSE) {
   $fields = _content_profile_registration_get_fields($type);
@@ -107,18 +120,6 @@ function _content_profile_registration_get_field_select($type, $required=FALSE) 
     }
   }
   return $return;
-}
-
-function _content_profile_registration_required_fields() {
-  foreach (content_profile_get_types('names') as $type => $typename) {
-    $fields = _content_profile_registration_get_fields($type);
-    foreach ($fields as $field_name => $field) {
-      if ($field['required']) {
-        return TRUE;
-      }
-    }
-  }
-  return FALSE;
 }
 
 function content_profile_registration_admin_settings_submit($form, $form_state) {
