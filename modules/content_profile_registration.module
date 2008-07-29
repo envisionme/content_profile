@@ -147,7 +147,6 @@ function content_profile_registration_user_register_submit($form, $form_state) {
     // Create the node.
     $node = node_submit($node);
     module_invoke_all('submit', $node);
-    module_invoke_all('nodeapi', $node, 'submit', NULL, NULL);
     node_save($node);
     // Give us a nice log message.
     if ($node->nid) {
