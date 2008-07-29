@@ -39,7 +39,7 @@ function content_profile_registration_form_alter(&$form, $form_state, $form_id) 
               '#type' => 'fieldset',
               '#title' => $typename
             );
-            $form['content_profile_registration_'. $type] = array_merge($form['content_profile_registration_' .$type], $elements);
+            $form['content_profile_registration_'. $type] = array_merge($form['content_profile_registration_'. $type], $elements);
           }
         }
       }
@@ -72,7 +72,7 @@ function content_profile_registration_form_alter(&$form, $form_state, $form_id) 
         $fields = array_keys($fields);
       }
 
-      $form['registration']['content_profile_registration_display_'.$type] = array(
+      $form['registration']['content_profile_registration_display_'. $type] = array(
         '#type' => 'select',
         '#multiple' => TRUE,
         '#title' => t('Show following fields on user registration'),
@@ -98,7 +98,7 @@ function _content_profile_registration_get_fields($type) {
 function _content_profile_registration_get_field_select($type, $required=FALSE) {
   $fields = _content_profile_registration_get_fields($type);
   $return = array();
-  foreach($fields as $fieldname => $info) {
+  foreach ($fields as $fieldname => $info) {
     if ($info['required'] && $required) {
       $return[$fieldname] = $info['widget']['label'];
     }
@@ -122,7 +122,7 @@ function _content_profile_registration_required_fields() {
 }
 
 function content_profile_registration_admin_settings_submit($form, $form_state) {
-  foreach($form_state['values'] as $key => $value) {
+  foreach ($form_state['values'] as $key => $value) {
     if (strpos($key, 'content_profile_registration_') !== FALSE) {
       variable_set($key, $value);
     }
