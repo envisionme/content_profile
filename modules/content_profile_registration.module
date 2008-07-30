@@ -57,14 +57,17 @@ function content_profile_registration_form_alter(&$form, &$form_state, $form_id)
         '#description' => t('Use this content type on the user registration page'),
         '#default_value' => content_profile_get_settings($type, 'registration_use'),
       );
-      $form['registration']['registration_display'] = array(
-        '#type' => 'select',
-        '#multiple' => TRUE,
-        '#title' => t('Show this fields beside required fields'),
-        '#description' => t('Fields selected here will show up on the user registration form. Required fields will always show up.'),
-        '#options' => _content_profile_registration_get_field_select($type, FALSE),
-        '#default_value' => content_profile_get_settings($type, 'registration_display'),
-      );
+      $options = _content_profile_registration_get_field_select($type, FALSE);
+      if (!empty($options)) {
+        $form['registration']['registration_display'] = array(
+          '#type' => 'select',
+          '#multiple' => TRUE,
+          '#title' => t('Show this fields beside required fields'),
+          '#description' => t('Fields selected here will show up on the user registration form. Required fields will always show up.'),
+          '#options' => $options,
+          '#default_value' => content_profile_get_settings($type, 'registration_display'),
+        );
+      }
     }
     else {
       $help = t('There are no fields defined, so registration integration is disabled.');
@@ -102,7 +105,13 @@ function _content_profile_registration_get_field_select($type, $required = NULL)
   $fields = _content_profile_registration_get_fields($type);
   $return = array();
   foreach ($fields as $fieldname => $info) {
-    if ($required || !$info['required']) {
+    if ($required === NULL) {
+      $return[$fieldname] = $info['widget']['label'];
+    }
+    elseif ($required && $info['required']) {
+      $return[$fieldname] = $info['widget']['label'];
+    }
+    elseif ($required === FALSE && !$info['required']) {
       $return[$fieldname] = $info['widget']['label'];
     }
   }
