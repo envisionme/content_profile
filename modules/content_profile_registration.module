@@ -151,6 +151,6 @@ function content_profile_registration_user_register_submit($form, $form_state) {
 function content_profile_registration_content_profile_settings() {
   return array(
     'registration_use' => TRUE,
-    'registration_display' => 'teaser',
+    'registration_display' => array(),
   );
 }
