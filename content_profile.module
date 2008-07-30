@@ -85,7 +85,9 @@ function content_profile_admin_settings(&$form_state, $type) {
 function content_profile_admin_settings_submit($form, &$form_state) {
   $settings = content_profile_get_settings($form_state['type']);
   foreach (content_profile_settings_info() as $setting => $default) {
-    $settings[$setting] = $form_state['values'][$setting];
+    if (isset($form_state['values'][$setting])) {
+      $settings[$setting] = $form_state['values'][$setting];
+    }
   }
   content_profile_set_settings($form_state['type'], $settings);
   drupal_set_message('Your changes have been saved.');
@@ -118,7 +120,7 @@ function content_profile_get_types($op = 'types', $setting = NULL) {
   $types = array();
 
   foreach (node_get_types($op) as $type => $info) {
-    if (is_content_profile($type) && (!isset($setting) || content_profile_get_setting($type, $setting))) {
+    if (is_content_profile($type) && (!isset($setting) || content_profile_get_settings($type, $setting))) {
       $types[$type] = $info;
     }
   }

@@ -9,145 +9,134 @@
 /**
  * Implementation of hook_form_alter().
  */
-function content_profile_registration_form_alter(&$form, $form_state, $form_id) {
+function content_profile_registration_form_alter(&$form, &$form_state, $form_id) {
   if ($form_id == 'user_register' && module_exists('content')) {
     module_load_include('inc', 'content', 'includes/content.node_form');
-    $widget_types = _content_widget_types();
+    $profile_types = content_profile_get_types('names', 'registration_use');
 
-    foreach (content_profile_get_types('names') as $type => $typename) {
-      $use = variable_get('content_profile_registration_use'. $type, TRUE);
-      if ($use) {
-        $display = variable_get('content_profile_registration_display_'. $type, FALSE);
-        if ($display === FALSE) {
-          $display = _content_profile_registration_get_field_select($type, TRUE);
-          $display = array_keys($display);
+    foreach ($profile_types as $type => $typename) {
+      $display_fields = _content_profile_registration_get_field_select($type, TRUE);
+      $display_fields += content_profile_get_settings($type, 'registration_display');
+
+      if (!empty($display_fields)) {
+        $form_state['content_profile_registration'][$type]['display_fields'] = $display_fields;
+        $elements = array();
+        $fields = _content_profile_registration_get_fields($type);
+
+        foreach (array_intersect(array_keys($fields), array_keys($display_fields)) as $field_name) {
+          $cck_field = content_field_form($form, $form_state, $fields[$field_name]);
+          $elements = array_merge($elements, $cck_field);
         }
-        if (!empty($display) || $display ) {
-          $elements = array();
 
-          $node = new stdClass();
-          $node->type = $type;
-
-          $fields = _content_profile_registration_get_fields($type);
-
-          foreach ($fields as $field_name => $field) {
-            if (in_array($field_name, $display)) {
-              $cck_field = content_field_form($form, $form_state, $field);
-              $elements = array_merge($elements, $cck_field);
-            }
-          }
-
-          if (!isset($form['content_profile_registration_'. $type])) {
-            $form['content_profile_registration_'. $type] = array(
-              '#type' => 'fieldset',
-              '#title' => $typename
-            );
-            $form['content_profile_registration_'. $type] = array_merge($form['content_profile_registration_'. $type], $elements);
-          }
-        }
+        $form['content_profile_registration_'. $type] = array(
+          '#type' => 'fieldset',
+          '#title' => check_plain($typename),
+          '#weight' => content_profile_get_settings($type, 'weight'),
+        );
+        $form['content_profile_registration_'. $type] = $elements;
       }
     }
-
-    $form['#submit'][] = 'content_profile_registration_user_register_submit';
-    $form['#validate'][] = 'content_profile_registration_user_register_validate';
+    if ($profile_types) {
+      $form['#submit'][] = 'content_profile_registration_user_register_submit';
+      $form['#validate'][] = 'content_profile_registration_user_register_validate';
+    }
   }
   elseif ($form_id == 'content_profile_admin_settings') {
     $type = $form_state['type'];
+    $form['registration'] = array(
+      '#type' => 'fieldset',
+      '#title' => t('User Registration'),
+      '#description' => t('Customize how this content profile shows up on the user registration page.'),
+      '#collapsible' => TRUE,
+    );
     $options = _content_profile_registration_get_field_select($type);
     if (!empty($options)) {
-      $form['registration'] = array(
-        '#type' => 'fieldset',
-        '#title' => t('User Registration'),
-        '#description' => t('Customize how this content profile shows up on the user registration page.'),
-        '#collapsible' => TRUE,
-      );
-      $form['registration']['content_profile_registration_use_'. $type] = array(
+      $form['registration']['registration_use'] = array(
         '#type' => 'checkbox',
         '#title' => t('Use on Registration'),
         '#description' => t('Use this content type on the user registration page'),
-        '#default_value' => variable_get('content_profile_registration_use_'. $type, TRUE),
+        '#default_value' => content_profile_get_settings($type, 'registration_use'),
       );
-
-      $fields = variable_get('content_profile_registration_display_'. $type, FALSE);
-      if ($fields === FALSE) {
-        // user hasn't set any fields let's default to all required fields
-        $fields = _content_profile_registration_get_field_select($type, TRUE);
-        $fields = array_keys($fields);
-      }
-
-      $form['registration']['content_profile_registration_display_'. $type] = array(
+      $form['registration']['registration_display'] = array(
         '#type' => 'select',
         '#multiple' => TRUE,
-        '#title' => t('Show following fields on user registration'),
+        '#title' => t('Show this fields beside required fields'),
         '#description' => t('Fields selected here will show up on the user registration form. Required fields will always show up.'),
-        '#options' => $options,
-        '#default_value' => $fields,
+        '#options' => _content_profile_registration_get_field_select($type, FALSE),
+        '#default_value' => content_profile_get_settings($type, 'registration_display'),
       );
     }
-    $form['#submit'][] = 'content_profile_registration_admin_settings_submit';
-
+    else {
+      $help = t('There are no fields defined, so registration integration is disabled.');
+      $form['registration']['content'] = array('#value' => '<br /><p>'. $help . '</p>');
+    }
   }
 }
 
 /**
- * helper function to return all available fields for a particular content type
- * 
- * @param string $type a content type to return fields for
- * @return array associated fields for the given content type
+ * Helper function to return all available fields for a particular content type.
+ *
+ * @param string $type
+ *   The content type to return fields for.
+ * @return array
+ *   Associated fields for the given content type.
  */
-
 function _content_profile_registration_get_fields($type) {
-   $typeinfo = content_types($type);
-   return $typeinfo['fields'];
+  $typeinfo = content_types($type);
+  return $typeinfo['fields'];
 }
 
 /**
- * returns an array suitable for use in a select field
+ * Returns an array of CCK fields of this type suitable for use in a select field
  *
- * @param string $type a content type to get the select elements for 
- * @param bool $required if $required is true only required fields fields will be returned if $required is FALSE all fields will be returned
- * @return array an array suitable for use in a select field
+ * @param string $type
+ *   A content type to get the select elements for.
+ * @param bool $required
+ *   If $required is FALSE only not required fields will be returned,
+ *   if $required is TRUE only required fields will be returned,
+ *   if it's NULL all fields will be returned.
+ * @return Array
+ *   An array of fields suitable for use in a select field.
 */
-function _content_profile_registration_get_field_select($type, $required=FALSE) {
+function _content_profile_registration_get_field_select($type, $required = NULL) {
   $fields = _content_profile_registration_get_fields($type);
   $return = array();
   foreach ($fields as $fieldname => $info) {
-    if ($info['required'] && $required) {
-      $return[$fieldname] = $info['widget']['label'];
-    }
-    elseif (!$required) {
+    if ($required || !$info['required']) {
       $return[$fieldname] = $info['widget']['label'];
     }
   }
   return $return;
 }
 
-function content_profile_registration_admin_settings_submit($form, $form_state) {
-  foreach ($form_state['values'] as $key => $value) {
-    if (strpos($key, 'content_profile_registration_') !== FALSE) {
-      variable_set($key, $value);
-    }
-  }
-}
-
-function content_profile_registration_user_register_submit($form, $form_state) {
+/**
+ * Validates the user registration form
+ */
+function content_profile_registration_user_register_validate($form_id, &$form_state) {
   require_once drupal_get_path('module', 'node') .'/node.pages.inc';
-  foreach (content_profile_get_types('names') as $type => $typename) {
+  foreach (content_profile_get_types('names', 'registration_use') as $type => $typename) {
     $node = new StdClass;
     $node->type = $type;
     $node->uid = $form_state['user']->uid;
     $node->title = $form_state['values']['name'];
     $node->name = $form_state['values']['name'];
 
-    // review the CCK API to see if there is a builtin for this foreach() functionality
-    foreach ($form_state['values'] as $field_name => $value) {
-      if (preg_match('/^field_/', $field_name)) {
-        $node->$field_name = $form_state['values'][$field_name];
-      }
+    foreach ($form_state['content_profile_registration'][$type]['display_fields'] as $field_name => $label) {
+      $node->$field_name = $form_state['values'][$field_name];
     }
+    content_validate($node);
+    $form_state['content_profile_registration'][$type]['node'] =& $node;
+  }
+}
+
+/**
+ * Submits the user registration form
+ */
+function content_profile_registration_user_register_submit($form, $form_state) {
+  foreach (content_profile_get_types('names', 'registration_use') as $type => $typename) {
+    $node = &$form_state['content_profile_registration'][$type]['node'];
     // Create the node.
     $node = node_submit($node);
-    module_invoke_all('submit', $node);
     node_save($node);
     // Give us a nice log message.
     if ($node->nid) {
@@ -156,18 +145,12 @@ function content_profile_registration_user_register_submit($form, $form_state) {
   }
 }
 
-function content_profile_registration_user_register_validate($form_id, $form_state) {
-  // Create a dummy node to pass along to CCK.
-  $node = new stdClass();
-  $fields = variable_get('content_profile_registration_display_profile', array());
-  if (!empty($fields)) {
-    foreach ($fields as $field) {
-      $node->$field = $form_state[$field];
-    }
-  }
-  // is proper node->type setting necessary for content_validate() to function properly?
-  foreach (content_profile_get_types('names') as $type => $typename) {
-    $node->type = $type;
-    content_validate($node);
-  }
+/**
+ * Implementation of hook_content_profile_settings().
+ */
+function content_profile_registration_content_profile_settings() {
+  return array(
+    'registration_use' => TRUE,
+    'registration_display' => 'teaser',
+  );
 }
