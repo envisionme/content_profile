@@ -105,13 +105,7 @@ function _content_profile_registration_get_field_select($type, $required = NULL)
   $fields = _content_profile_registration_get_fields($type);
   $return = array();
   foreach ($fields as $fieldname => $info) {
-    if ($required === NULL) {
-      $return[$fieldname] = $info['widget']['label'];
-    }
-    elseif ($required && $info['required']) {
-      $return[$fieldname] = $info['widget']['label'];
-    }
-    elseif ($required === FALSE && !$info['required']) {
+    if (!isset($required)	|| $required == $info['required']) {
       $return[$fieldname] = $info['widget']['label'];
     }
   }
