@@ -250,7 +250,7 @@ function _content_profile_node_delete($node) {
 function content_profile_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
   global $last_nid;
 
-  if ($op == 'prepare' && is_content_profile($node) && !isset($node->nid) && !user_access('administer nodes')) {
+  if ($op == 'prepare' && is_content_profile($node) && !isset($node->nid) && $node->uid && !user_access('administer nodes')) {
     // Check if this nodetype already exists
     if ($nid = content_profile_profile_exists($node, $node->uid)) {
       // This node already exists, redirect to edit page
