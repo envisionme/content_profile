@@ -157,6 +157,7 @@ function content_profile_form_alter(&$form, $form_state, $form_id) {
       '#type' => 'fieldset',
       '#title' => t('Content Profile'),
       '#collapsible' => TRUE,
+      '#collapsed' => TRUE,
       '#weight' => 32,
     );
     $form['content_profile']['content_profile'] = array(
