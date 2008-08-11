@@ -11,29 +11,28 @@
  */
 function content_profile_registration_form_alter(&$form, &$form_state, $form_id) {
   if ($form_id == 'user_register' && module_exists('content')) {
-    module_load_include('inc', 'content', 'includes/content.node_form');
+    require_once drupal_get_path('module', 'node') .'/node.pages.inc';
     $profile_types = content_profile_get_types('names', 'registration_use');
+    $form += array('#field_info' => array());
 
     foreach ($profile_types as $type => $typename) {
-      $display_fields = _content_profile_registration_get_field_select($type, TRUE);
-      $display_fields += content_profile_get_settings($type, 'registration_display');
+      // Initialize new node:
+      $node = array('uid' => 0, 'name' => '', 'type' => $type);
+      // Get the node form
+      $node_form = drupal_retrieve_form($type .'_node_form', $form_state, $node);
+      drupal_prepare_form($type .'_node_form', $node_form, $form_state);
 
-      if (!empty($display_fields)) {
-        $form_state['content_profile_registration'][$type]['display_fields'] = $display_fields;
-        $elements = array();
-        $fields = _content_profile_registration_get_fields($type);
+      $form['#field_info'] += $node_form['#field_info'];
+      foreach ($node_form['#field_info'] as $field_name => $info) {
+        $form[$field_name] = $node_form[$field_name];
+      }
+      // Set this to the values of one node, as it might be need by some #ahah callbacks
+      $form['#node'] = $node_form['#node'];
+      $form['type'] = $node_form['type'];
 
-        foreach (array_intersect(array_keys($fields), array_keys($display_fields)) as $field_name) {
-          $cck_field = content_field_form($form, $form_state, $fields[$field_name]);
-          $elements = array_merge($elements, $cck_field);
-        }
-
-        $form['content_profile_registration_'. $type] = array(
-          '#type' => 'fieldset',
-          '#title' => check_plain($typename),
-          '#weight' => content_profile_get_settings($type, 'weight'),
-        );
-        $form['content_profile_registration_'. $type] = $elements;
+      // Hide fields
+      foreach (content_profile_get_settings($type, 'registration_hide') as $field_name) {
+        $form[$field_name]['#access'] = FALSE;
       }
     }
     if ($profile_types) {
@@ -59,13 +58,12 @@ function content_profile_registration_form_alter(&$form, &$form_state, $form_id)
       );
       $options = _content_profile_registration_get_field_select($type, FALSE);
       if (!empty($options)) {
-        $form['registration']['registration_display'] = array(
+        $form['registration']['registration_hide'] = array(
           '#type' => 'select',
           '#multiple' => TRUE,
-          '#title' => t('Show this fields beside required fields'),
-          '#description' => t('Fields selected here will show up on the user registration form. Required fields will always show up.'),
+          '#title' => t('Hide this fields during registration'),
           '#options' => $options,
-          '#default_value' => content_profile_get_settings($type, 'registration_display'),
+          '#default_value' => content_profile_get_settings($type, 'registration_hide'),
         );
       }
     }
@@ -115,13 +113,12 @@ function _content_profile_registration_get_field_select($type, $required = NULL)
 /**
  * Validates the user registration form
  */
-function content_profile_registration_user_register_validate($form_id, &$form_state) {
-  require_once drupal_get_path('module', 'node') .'/node.pages.inc';
+function content_profile_registration_user_register_validate($form, &$form_state) {
   foreach (content_profile_get_types('names', 'registration_use') as $type => $typename) {
     $node = new StdClass;
     $node->type = $type;
 
-    foreach ($form_state['content_profile_registration'][$type]['display_fields'] as $field_name => $label) {
+    foreach ($form['#field_info'] as $field_name => $label) {
       $node->$field_name = $form_state['values'][$field_name];
     }
     content_validate($node);
@@ -156,6 +153,6 @@ function content_profile_registration_user_register_submit($form, &$form_state) 
 function content_profile_registration_content_profile_settings() {
   return array(
     'registration_use' => TRUE,
-    'registration_display' => array(),
+    'registration_hide' => array(),
   );
 }
