@@ -60,7 +60,7 @@ function content_profile_registration_form_alter(&$form, &$form_state, $form_id)
       if (!empty($options)) {
         $form['registration']['registration_hide'] = array(
           '#type' => 'checkboxes',
-          '#title' => t('Hide this fields during registration'),
+          '#title' => t('Hide these fields during registration'),
           '#options' => $options,
           '#default_value' => content_profile_get_settings($type, 'registration_hide'),
         );
