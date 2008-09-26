@@ -32,6 +32,16 @@ function content_profile_menu() {
   return $items;
 }
 
+/**
+ * Implementation of hook_views_api().
+ */
+function content_profile_views_api() {
+  return array(
+    'api' => 2,
+    'path' => drupal_get_path('module', 'content_profile') . '/views'
+  );
+}
+
 
 /**
  * Menu callback; content profile settings.

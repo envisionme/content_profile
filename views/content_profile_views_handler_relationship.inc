@@ -1,28 +1,5 @@
-<?php
+<?php 
 // $Id$
-
-/**
- * @file content_profile.views.inc
- * Provides support for the Views module.
- */
-
-/**
- * Implementation of hook_views_data_alter().
- */
-function content_profile_views_data_alter(&$data) {
-  // node relationship for profiles
-  $data['users']['content_profile_rel'] = array(
-    'group' => t('Node'),
-    'title' => t('Content Profile'),
-    'help' => t('Create a relationship to a content profile of the user.'),
-    'relationship' => array(
-      'handler' => 'content_profile_views_handler_relationship',
-      'base' => 'node',
-      'base field' => 'uid',
-      'label' => t('Content Profile'),
-    ),
-  );
-}
 
 /**
  * Specialized relationship handler to adding content profiles.
