@@ -30,9 +30,9 @@ function theme_content_profile_display_link($element) {
 }
 
 /**
- * Implementation of template_preprocess_HOOK()
+ * Implementation of content_profile_preprocess_HOOK()
  */
-function template_preprocess_content_profile_display_view(&$variables) {
+function content_profile_preprocess_content_profile_display_view(&$variables) {
   $element = $variables['element'];
   $node = content_profile_load($element['#content_type'], $element['#uid']);
   $variables['node'] = &$node;
