@@ -26,14 +26,14 @@ function content_profile_registration_form_alter(&$form, &$form_state, $form_id)
       foreach ($node_form['#field_info'] as $field_name => $info) {
         $form[$field_name] = $node_form[$field_name];
       }
-      
+
       $keys = array_keys($node_form);
       foreach ($keys as $key) {
         if (stristr($key, 'group_')) {
           $form[$key] = $node_form[$key];
         }
       }
-      
+
       // Set this to the values of one node, as it might be need by some #ahah callbacks
       $form['#node'] = $node_form['#node'];
       $form['type'] = $node_form['type'];

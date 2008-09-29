@@ -75,7 +75,7 @@ function theme_content_profile_display_tab_edit($node) {
  * Gets the edit path for a content_profile
  */
 function content_profile_get_edit_path($node) {
-  $handler = variable_get('content_profile_path_handler', 'content_profile_default_path_hanlder');
+  $handler = variable_get('content_profile_path_handler', 'content_profile_default_path_handler');
   return $handler('edit', $node);
 }
 
@@ -83,7 +83,7 @@ function content_profile_get_edit_path($node) {
  * Gets the add path for a content_profile of the active user
  */
 function content_profile_get_add_path($type) {
-  $handler = variable_get('content_profile_path_handler', 'content_profile_default_path_hanlder');
+  $handler = variable_get('content_profile_path_handler', 'content_profile_default_path_handler');
   return $handler('add', $type);
 }
 
@@ -93,10 +93,10 @@ function content_profile_get_add_path($type) {
  * @param $action 'add' or 'edit
  * @param $arg For 'add' the content type, for 'edit' the node to be edited
  */
-function content_profile_default_path_hanlder($action, $arg) {
+function content_profile_default_path_handler($action, $arg) {
   switch ($action) {
     case 'add':
-      return 'node/add/'. $arg;
+      return 'node/add/'. str_replace('_', '-', $arg);
     case 'edit':
       return 'node/'. $arg->nid .'/edit';
   }
