@@ -115,9 +115,11 @@ function _content_profile_registration_get_field_select($type, $required = NULL)
     }
   }
 
-  $groups = fieldgroup_groups($type);
-  foreach ($groups as $groupname => $info) {
-    $return[$groupname] = t('Field Group: ') . $info['label'];
+  if (module_exists('fieldgroup')) {
+    $groups = fieldgroup_groups($type);
+    foreach ($groups as $groupname => $info) {
+      $return[$groupname] = t('Field Group: ') . $info['label'];
+    }
   }
 
   return $return;
