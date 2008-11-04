@@ -38,7 +38,7 @@ function content_profile_menu() {
 function content_profile_views_api() {
   return array(
     'api' => 2,
-    'path' => drupal_get_path('module', 'content_profile') . '/views'
+    'path' => drupal_get_path('module', 'content_profile') .'/views',
   );
 }
 
@@ -173,7 +173,7 @@ function content_profile_form_alter(&$form, $form_state, $form_id) {
     $form['content_profile']['content_profile_use'] = array(
       '#type' => 'checkbox',
       '#title' => t('Use this content type as a content profile for users'),
-      '#default_value' => variable_get('content_profile_use_'.$form['#node_type']->type, FALSE),
+      '#default_value' => variable_get('content_profile_use_'. $form['#node_type']->type, FALSE),
     );
   }
 }

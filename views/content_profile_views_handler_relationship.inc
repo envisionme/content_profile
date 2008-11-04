@@ -1,5 +1,6 @@
 <?php 
 // $Id$
+// @file
 
 /**
  * Specialized relationship handler to adding content profiles.
