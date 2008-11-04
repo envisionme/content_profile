@@ -137,7 +137,7 @@ function content_profile_registration_user_register_validate($form, &$form_state
       $node->$field_name = $form_state['values'][$field_name];
     }
     content_validate($node);
-    $form_state['content_profile_registration'][$type]['node'] =& $node;
+    $form_state['content_profile_registration'][$type]['node'] = $node;
   }
 }
 
