@@ -112,7 +112,7 @@ function is_content_profile($type) {
   if (is_object($type)) {
     $type = $type->type;
   }
-  return is_array(variable_get('content_profile_'. $type, FALSE));
+  return variable_get('content_profile_use_'. $type, FALSE);
 }
 
 /**
@@ -170,11 +170,10 @@ function content_profile_form_alter(&$form, $form_state, $form_id) {
       '#collapsed' => TRUE,
       '#weight' => 32,
     );
-    $form['content_profile']['content_profile'] = array(
+    $form['content_profile']['content_profile_use'] = array(
       '#type' => 'checkbox',
       '#title' => t('Use this content type as a content profile for users'),
-      '#default_value' => is_content_profile($form['#node_type']->type),
-      '#return_value' => array(),
+      '#default_value' => variable_get('content_profile_use_'.$form['#node_type']->type, FALSE),
     );
   }
 }
