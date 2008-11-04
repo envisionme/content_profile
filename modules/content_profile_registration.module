@@ -155,7 +155,7 @@ function content_profile_registration_user_register_submit($form, &$form_state) 
       node_save($node);
       // Give us a nice log message.
       if ($node->nid) {
-        watchdog('content', t('Content Profile: added %user %type upon registration.', array('%user' => $node->name, '%type' => $type)), WATCHDOG_NOTICE, l(t('view'), "node/$node->nid"));
+        watchdog('content', 'Content Profile: added %user %type upon registration.', array('%user' => $node->name, '%type' => $type), WATCHDOG_NOTICE, l(t('view'), "node/$node->nid"));
       }
     }
   }
