@@ -43,16 +43,14 @@ function content_profile_preprocess_content_profile_display_view(&$variables) {
   $variables['title'] = check_plain(node_get_types('name', $node->type));
 
   $tabs = array();
-  if ($element['#edit_link'] || $element['#style'] == 'teaser') {
-    $tabs[] = theme('content_profile_display_tab_view', $node);
-  }
   if ($element['#edit_link']) {
+    $tabs[] = theme('content_profile_display_tab_view', $node);
     $tabs[] = theme('content_profile_display_tab_edit', $node);
   }
   if (count($tabs) > 0) {
     $variables['tabs'] = $tabs;
   }
-  $variables['content'] = node_view($node, ($element['#style'] == 'teaser'), TRUE, FALSE);
+  $variables['content'] = node_view($node, ($element['#style'] == 'teaser'), TRUE, TRUE);
 }
 
 /**
