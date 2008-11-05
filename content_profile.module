@@ -78,6 +78,11 @@ function content_profile_admin_settings(&$form_state, $type) {
     '#title' => t("Include an edit link to the display"),
     '#default_value' => content_profile_get_settings($type, 'edit_link'),
   );
+  $form['display']['edit_link_sub'] = array(
+    '#type' => 'checkbox',
+    '#title' => t("Include an edit link as a sub-tab on user profile page"),
+    '#default_value' => content_profile_get_settings($type, 'edit_link_sub'),
+  );
   $form['display']['add_link'] = array(
     '#type' => 'checkbox',
     '#title' => t("Show a link to the content profile creation page, if there is no profile."),
@@ -101,6 +106,7 @@ function content_profile_admin_settings_submit($form, &$form_state) {
   }
   content_profile_set_settings($form_state['type'], $settings);
   drupal_set_message('Your changes have been saved.');
+  menu_rebuild();
 }
 
 /**
@@ -176,6 +182,9 @@ function content_profile_form_alter(&$form, $form_state, $form_id) {
       '#default_value' => variable_get('content_profile_use_'. $form['#node_type']->type, FALSE),
     );
   }
+  elseif ($form_id == 'user_profile_form') {
+    $form['#redirect'] = 'user/'. $form['_account']['#value']->uid;
+  }
 }
 
 /**
@@ -185,6 +194,52 @@ function content_profile_user($op, &$edit, &$account, $category = NULL) {
   global $user;
 
   switch ($op) {
+    case 'categories':
+      foreach (content_profile_get_types() as $type) {
+        // if user can edit their own content or they can administer users
+        if (content_profile_get_settings($type->type, 'edit_link_sub') && 
+            (($user->uid == arg(1) && user_access('edit own '. $type->type .' content')) || user_access('administer users'))) {
+          $data[] = array(
+            'name' => $type->type,
+            'title' => $type->name,
+            'weight' => content_profile_get_settings($type->type, 'weight'),
+          );
+        }
+      }
+      return $data;
+      break;
+    
+    case 'form':
+      if (key_exists($category, content_profile_get_types())) {
+        module_load_include('inc', 'node', 'node.pages');
+        $form_state = array();
+        $node = content_profile_load($category, $account->uid);
+        
+        // create a dummy object if the user has not created this profile type yet
+        if (!$node) {
+          $node = array('uid' => $account->uid, 'name' => $account->name, 'type' => $category);
+        }
+        
+        $form[$category] = drupal_retrieve_form($category .'_node_form', $form_state, $node);
+        unset($form[$category]['author']);  // avoid non-functional form elements for admin
+        unset($form[$category]['buttons']); // avoid duplicate form buttons
+        unset($form[$category]['uid']);     // avoid uid error via user_profile_form_validate() failed validation
+        
+        drupal_prepare_form($category .'_node_form', $form[$category], $form_state);
+
+        $form['#redirect'] = 'user/'. $account->uid;
+        return $form;
+      }
+      break;
+    
+    case 'update':
+      if (key_exists($category, content_profile_get_types())) {
+        $node = (object)$edit;
+        $node->uid = $account->uid;
+        node_save($node);
+      }
+      break;
+
     case 'view':
       $account->content['content_profile'] = content_profile_show_profiles($account->uid);
       break;
@@ -337,7 +392,8 @@ function content_profile_content_profile_settings() {
   return array(
     'weight' => 0,
     'user_display' => 'teaser',
-    'edit_link' => 1,
+    'edit_link' => 0,
+    'edit_link_sub' => 1,
     'add_link' => 1,
   );
 }
