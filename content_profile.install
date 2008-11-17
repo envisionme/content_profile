@@ -55,13 +55,16 @@ function content_profile_import() {
       }
     }
     foreach ($cp_settings as $type => $data) {
+      variable_set('content_profile_use_'. $type, 1);
+      $data['edit_link_sub'] = $data['user_edit'];
+      unset($data['user_edit']);
       variable_set('content_profile_'. $type, $data);
     }
     variable_del('nodeprofile_settings');
   }
   //bio
   if ($type = variable_get('bio_nodetype', FALSE)) {
-    variable_set('content_profile_'. $type, array());
+    variable_set('content_profile_use_'. $type, 1);
     variable_del('bio_nodetype');
   }
 }
@@ -71,11 +74,11 @@ function content_profile_import() {
  */
 function content_profile_uninstall() {
   foreach (node_get_types('names') as $typename => $visiblename) {
-    if (variable_get('content_profile_'. $typename, 0)) {
+    if (variable_get('content_profile_use'. $typename, 0)) {
+      variable_del('content_profile_use_'. $typename);
       variable_del('content_profile_'. $typename);
     }
   }
-  variable_del('content_profile_settings');
 }
 
 /**

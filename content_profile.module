@@ -80,7 +80,7 @@ function content_profile_admin_settings(&$form_state, $type) {
   );
   $form['display']['edit_link_sub'] = array(
     '#type' => 'checkbox',
-    '#title' => t("Include an edit link as a sub-tab on user profile page"),
+    '#title' => t("Include an edit link as a sub-tab on the user profile page"),
     '#default_value' => content_profile_get_settings($type, 'edit_link_sub'),
   );
   $form['display']['add_link'] = array(
@@ -150,13 +150,16 @@ function content_profile_get_types($op = 'types', $setting = NULL) {
 function content_profile_node_type($op, $info) {
   switch ($op) {
     case 'delete':
+      variable_del('content_profile_use_'. $info->type);
       variable_del('content_profile_'. $info->type);
       break;
     case 'update':
       if (!empty($info->old_type) && $info->old_type != $info->type) {
         if (is_content_profile($info->old_type)) {
           $settings = variable_get('content_profile_'. $info->old_type, array());
+          variable_del('content_profile_use_'. $info->old_type);
           variable_del('content_profile_'. $info->old_type);
+          variable_set('content_profile_use_'. $info->type, 1);
           variable_set('content_profile_'. $info->type, $settings);
         }
       }
@@ -197,7 +200,7 @@ function content_profile_user($op, &$edit, &$account, $category = NULL) {
     case 'categories':
       foreach (content_profile_get_types() as $type) {
         // if user can edit their own content or they can administer users
-        if (content_profile_get_settings($type->type, 'edit_link_sub') && 
+        if (content_profile_get_settings($type->type, 'edit_link_sub') &&
             (($user->uid == arg(1) && user_access('edit own '. $type->type .' content')) || user_access('administer users'))) {
           $data[] = array(
             'name' => $type->type,
