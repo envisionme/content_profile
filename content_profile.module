@@ -239,9 +239,6 @@ function content_profile_form_alter(&$form, $form_state, $form_id) {
       '#default_value' => variable_get('content_profile_use_'. $form['#node_type']->type, FALSE),
     );
   }
-  elseif ($form_id == 'user_profile_form') {
-    $form['#redirect'] = 'user/'. $form['_account']['#value']->uid;
-  }
   elseif (isset($form['#node']) && $form['#node']->type .'_node_form' == $form_id && is_content_profile($form['#node'])) {
     // Customize the redirect target and buttons of our node forms.
     if (arg(0) == 'user' && is_numeric(arg(1)) && arg(2) == 'edit' || arg(2) == 'profile') {
