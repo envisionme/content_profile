@@ -6,6 +6,18 @@
  * Marks content types as profiles.
  */
 
+
+/**
+ * Implementation of hook_init().
+ */
+function content_profile_init() {
+  if (module_exists('panels')) {
+    module_load_include('inc', 'content_profile', 'content_profile.panels');
+  }
+}
+
+
+
 /**
  * Implementation of hook_menu().
  */
