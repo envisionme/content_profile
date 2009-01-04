@@ -56,7 +56,7 @@ function content_profile_import() {
     }
     foreach ($cp_settings as $type => $data) {
       variable_set('content_profile_use_'. $type, 1);
-      $data['edit_link_sub'] = $data['user_edit'];
+      $data['edit_tab'] = $data['user_edit'] ? 'sub' : 0;
       unset($data['user_edit']);
       variable_set('content_profile_'. $type, $data);
     }
@@ -99,6 +99,24 @@ function content_profile_update_6002() {
   if (($type = node_get_types('type', 'profile')) && !$type->custom) {
     $type->custom = TRUE;
     node_type_save($type);
+  }
+  return $ret;
+}
+
+/**
+ * Update the settings to reflect the changes of the format
+ * ('edit_link_sub' has been removed in favour of 'edit_tab')
+ */
+function content_profile_update_6003() {
+  $ret = array();
+  drupal_load('module', 'content_profile');
+  foreach (content_profile_get_types('names') as $type => $type_name) {
+    $settings = content_profile_get_settings($type);
+    if (!empty($settings['edit_link_sub'])) {
+      unset($settings['edit_link_sub']);
+      $settings['edit_tab'] = 'sub';
+      content_profile_set_settings($type, $settings);
+    }
   }
   return $ret;
 }
