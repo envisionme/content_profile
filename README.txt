@@ -34,3 +34,17 @@ Hints:
  * When using content profiles the "title" field is sometimes annoying. You can rename
    it at the content types settings or hide it in the form and auto generate a title by
    using the auto nodetitle module http://drupal.org/project/auto_nodetitle.
+   
+ * If you want to link to a content profile of a user, you can always link to the path
+   "user/UID/profile/TYPE" where UID is the users id and TYPE the machine readable content
+   type name, an example path would be "user/1/profile/profile".
+   This path is working regardless the user has already profile content created or not.
+
+ * If you want to theme your content profile, you can do it like with any other content.
+   Read http://drupal.org/node/266817.
+   
+ * If you want a content profile to be private while your site content should be available
+   to the public, you need a module that allows configuring more fine grained access control
+   permissions, e.g. the module Content Access (http://drupal.org/project/content_access)
+   allows you to that.
+
