@@ -258,11 +258,15 @@ function content_profile_form_alter(&$form, $form_state, $form_id) {
     );
   }
   elseif (isset($form['#node']) && $form['#node']->type .'_node_form' == $form_id && is_content_profile($form['#node'])) {
-    // Customize the redirect target and buttons of our node forms.
+    // Customize the redirect target and buttons of our own node forms.
     if (arg(0) == 'user' && is_numeric(arg(1)) && arg(2) == 'edit' || arg(2) == 'profile') {
       $form['buttons']['preview']['#access'] = FALSE;
       $form['buttons']['delete']['#access'] = FALSE;
       $form['#redirect'] = arg(2) == 'profile' ? 'user/'. $form['#node']->uid : $_GET['q'];
+    }
+    // Set the author value - note that this works only for admins.
+    if (!empty($_GET['uid']) && ($uid = intval($_GET['uid'])) && ($user = user_load($uid))) {
+      $form['author']['name']['#default_value'] = $user->name;
     }
   }
 }
@@ -376,6 +380,11 @@ function content_profile_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
   elseif ($op == 'alter' && is_content_profile($node->type) && isset($last_nid)) {
     // Index themed node
     $node->body = theme('node', $node, FALSE, TRUE); //TODO: check if still necessary and if it needs to be ported to 6.x
+  }
+  elseif ($op == 'prepare translation') {
+    // Make sure the translated profile belongs to the same user.
+    $node->uid = $node->translation_source->uid;
+    $node->name = $node->translation_source->name;
   }
 }
 
