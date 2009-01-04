@@ -14,6 +14,7 @@ function content_profile_init() {
   if (module_exists('panels')) {
     module_load_include('inc', 'content_profile', 'content_profile.panels');
   }
+  module_load_include('inc', 'content_profile', 'content_profile.theme_vars');
 }
 
 
@@ -540,6 +541,22 @@ function content_profile_theme() {
     ),
   );
 }
+
+/**
+ * Implementation of hook_preprocess().
+ * Adds $content_profile to each template where we can find a $uid.
+ */
+function content_profile_preprocess(&$variables, $hook) {
+  // Search the uid
+  foreach (array('account_id', 'uid', 'account', 'node', 'comment', 'user') as $name) {
+    if (isset($variables[$name])) {
+      $uid = is_object($variables[$name]) ? $variables[$name]->uid : $variables[$name];
+      $variables['content_profile'] = new content_profile_theme_variables($uid);
+      break;
+    }
+  }
+}
+
 
 /**
  * Implementation of hook_simpletest().
