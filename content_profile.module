@@ -377,10 +377,6 @@ function content_profile_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
       form_set_error('name', t('This user has already a content profile of this type. You can only create one profile per user.'));
     }
   }
-  elseif ($op == 'alter' && is_content_profile($node->type) && isset($last_nid)) {
-    // Index themed node
-    $node->body = theme('node', $node, FALSE, TRUE); //TODO: check if still necessary and if it needs to be ported to 6.x
-  }
   elseif ($op == 'prepare translation') {
     // Make sure the translated profile belongs to the same user.
     $node->uid = $node->translation_source->uid;
