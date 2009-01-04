@@ -8,9 +8,11 @@
  */
 ?>
 <?php if (isset($title)): ?>
-  <h3 class="content-profile-title"><?php print $title; ?></h3>
+  <h3 class="content-profile-title" id="content-profile-title-<?php print $type; ?>">
+  <?php print $title; ?>
+  </h3>
 <?php endif; ?>
-<div class="content-profile-display">
+<div class="content-profile-display" id="content-profile-display-<?php print $type; ?>">
   <?php if (isset($tabs)) : ?>
     <ul class="tabs content-profile">
       <?php foreach ($tabs as $tab) : ?>

@@ -37,6 +37,7 @@ function content_profile_preprocess_content_profile_display_view(&$variables) {
   $node = content_profile_load($element['#content_type'], $element['#uid']);
   $variables['node'] = &$node;
   $variables['uid'] = $element['#uid'];
+  $variables['type'] = $element['#content_type'];
 
   $path = drupal_get_path('module', 'content_profile') .'/content_profile.css';
   drupal_add_css($path, 'module', 'all', FALSE);
