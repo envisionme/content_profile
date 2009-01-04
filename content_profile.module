@@ -444,16 +444,32 @@ function content_profile_content_profile_settings() {
 }
 
 /**
- * Loads the node, like node_load but caches the results.
+ * Loads the node, like node_load but makes sure the results are cached.
+ *
+ * @param $type
+ *   The content profile's type
+ * @param $uid
+ *   The profile owner's user id
+ * @param $lang
+ *   Optional. If translation is enabled, the language of the profile to return.
  */
-function content_profile_load($type, $uid) {
+function content_profile_load($type, $uid, $lang = NULL) {
   static $cache = array();
 
-  if (!isset($cache[$type][$uid])) {
-    $cache[$type][$uid] = node_load(array('type' => $type, 'uid' => $uid));
+  if (!isset($lang)) {
+    $lang = module_exists('translation') && translation_supported_type($type) ? $GLOBALS['language']->language : '';
   }
-  return $cache[$type][$uid];
+
+  if (!isset($cache[$type][$uid][$lang])) {
+    $params = array('type' => $type, 'uid' => $uid);
+    if ($node = node_load($lang ? $params + array('language' => $lang) : $params)) {
+      $cache[$type][$uid][$lang] = $node->nid;
+    }
+    return $node;
+  }
+  return !empty($cache[$type][$uid][$lang]) ? node_load($cache[$type][$uid][$lang]) : FALSE;
 }
+
 
 /**
  * Returns an array suitable for use with drupal_render,
