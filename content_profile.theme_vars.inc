@@ -15,24 +15,24 @@ class content_profile_theme_variables {
   var $_cache = array();
   
   function content_profile_theme_variables($uid) {
-		$this->uid = $uid;
-	}
-	
-	/**
-	 * Gets the user id of the profiles owner.
-	 */
-	function get_uid() {
-	  return $uid;
-	}
-	
-	/**
+    $this->uid = $uid;
+  }
+  
+  /**
+   * Gets the user id of the profiles owner.
+   */
+  function get_uid() {
+    return $uid;
+  }
+  
+  /**
    * Gets all type names keyed with their machine readable names.
    */
-	function get_profile_types() {
-	  return content_profile_get_types('names');
-	}
+  function get_profile_types() {
+    return content_profile_get_types('names');
+  }
 
-	/**
+  /**
    * Gets all template variables for the content profile of this type.
    *
    * @param $type
@@ -42,24 +42,24 @@ class content_profile_theme_variables {
    *   An object of variables available for the profile node
    *   or if FALSE if there has been no profile created yet.
    */
-	function get_vars($type) {
-	  if (!isset($this->_cache['type'])) {
-	    $this->_cache['type'] = FALSE;
-	    if ($node = content_profile_load($type, $this->uid)) {
-	      $vars = array('node' => $node, 'teaser' => FALSE, 'page' => FALSE);
-	      $args = array(&$vars, 'node');
-	      // Apply all node template preprocessors
-	      foreach ($this->_get_node_preprocessors() as $function) {
+  function get_vars($type) {
+    if (!isset($this->_cache['type'])) {
+      $this->_cache['type'] = FALSE;
+      if ($node = content_profile_load($type, $this->uid)) {
+        $vars = array('node' => $node, 'teaser' => FALSE, 'page' => FALSE);
+        $args = array(&$vars, 'node');
+        // Apply all node template preprocessors
+        foreach ($this->_get_node_preprocessors() as $function) {
           if (function_exists($function)) {
             call_user_func_array($function, $args);
           }
-	      }
-	      $this->_cache['type'] = (object)$vars;
-	    }
-	  }
-	  return $this->_cache['type'];
-	}
-	
+        }
+        $this->_cache['type'] = (object)$vars;
+      }
+    }
+    return $this->_cache['type'];
+  }
+  
   /**
    * Generate a display of the given node.
    *
@@ -75,19 +75,19 @@ class content_profile_theme_variables {
    * @return
    *   An HTML representation of the themed node or FALSE if there has been no profile created yet.
    */
-	function get_view($type, $teaser = FALSE, $page = FALSE, $links = TRUE) {
+  function get_view($type, $teaser = FALSE, $page = FALSE, $links = TRUE) {
     if ($node = content_profile_load($type, $this->uid)) {
       return node_view($node, $teaser, $page, $links);
     }
     return FALSE;
-	}
+  }
 
-	
-	function _get_node_preprocessors() {
-	  $hooks = theme_get_registry();
-	  $functions = $hooks['node']['preprocess functions'];
-	  // We don't need 'template_preprocess'
-	  unset($functions[0]);
-	  return $functions;
-	}
+  
+  function _get_node_preprocessors() {
+    $hooks = theme_get_registry();
+    $functions = $hooks['node']['preprocess functions'];
+    // We don't need 'template_preprocess'
+    unset($functions[0]);
+    return $functions;
+  }
 }
