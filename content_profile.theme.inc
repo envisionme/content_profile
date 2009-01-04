@@ -11,7 +11,7 @@
  */
 function theme_content_profile_display_add_link($element) {
   $type = $element['#content_type'];
-  return l(t("Create your @profile_node.", array('@profile_node' => node_get_types('name', $type))), content_profile_get_add_path($type), array('query' => drupal_get_destination()));
+  return l(t("Create your @profile_node.", array('@profile_node' => node_get_types('name', $type))), content_profile_get_add_path($type, $element['#uid']), array('query' => drupal_get_destination()));
 }
 
 /**
@@ -36,6 +36,7 @@ function content_profile_preprocess_content_profile_display_view(&$variables) {
   $element = $variables['element'];
   $node = content_profile_load($element['#content_type'], $element['#uid']);
   $variables['node'] = &$node;
+  $variables['uid'] = $element['#uid'];
 
   $path = drupal_get_path('module', 'content_profile') .'/content_profile.css';
   drupal_add_css($path, 'module', 'all', FALSE);
@@ -74,15 +75,15 @@ function theme_content_profile_display_tab_edit($node) {
  */
 function content_profile_get_edit_path($node) {
   $handler = variable_get('content_profile_path_handler', 'content_profile_default_path_handler');
-  return $handler('edit', $node);
+  return $handler('edit', $node, $node->uid);
 }
 
 /**
  * Gets the add path for a content_profile of the active user
  */
-function content_profile_get_add_path($type) {
+function content_profile_get_add_path($type, $uid) {
   $handler = variable_get('content_profile_path_handler', 'content_profile_default_path_handler');
-  return $handler('add', $type);
+  return $handler('add', $type, $uid);
 }
 
 /**
@@ -90,12 +91,20 @@ function content_profile_get_add_path($type) {
  *
  * @param $action 'add' or 'edit
  * @param $arg For 'add' the content type, for 'edit' the node to be edited
+ * @param $uid the uid of the profile's owner.
  */
-function content_profile_default_path_handler($action, $arg) {
-  switch ($action) {
-    case 'add':
-      return 'node/add/'. str_replace('_', '-', $arg);
-    case 'edit':
-      return 'node/'. $arg->nid .'/edit';
+function content_profile_default_path_handler($action, $arg, $uid) {
+  $type = $action == 'add' ? $arg : $arg->type;
+  if (content_profile_get_settings($type, 'edit_tab') == 'top') {
+    return 'user/'. $uid . '/profile/'. $type;
+  }
+  elseif (content_profile_get_settings($type, 'edit_tab') == 'sub') {
+    return 'user/'. $uid . '/edit/'. $type;
+  }
+  elseif ($action == 'add') {
+    return 'node/add/'. str_replace('_', '-', $arg);
+  }
+  else {
+    return 'node/'. $arg->nid .'/edit';
   }
 }
