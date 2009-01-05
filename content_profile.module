@@ -18,7 +18,6 @@ function content_profile_init() {
 }
 
 
-
 /**
  * Implementation of hook_menu().
  */
@@ -543,10 +542,34 @@ function content_profile_theme() {
 }
 
 /**
- * Implementation of hook_preprocess().
- * Adds $content_profile to each template where we can find a $uid.
+ * Implementation of hook_theme_registry_alter().
+ * Adds our own preprocess functions to some templates. Further templates can be set in
+ * $conf['content_profile_extra_templates'] in settings.php.
  */
-function content_profile_preprocess(&$variables, $hook) {
+function content_profile_theme_registry_alter(&$items) {
+  $templates = array_merge(array(
+    'author_pane',
+    'comment',
+    'node',
+    'page',
+    'search_result',
+    'username',
+    'user_profile',
+    'user_signature',
+  ), variable_get('content_profile_extra_templates', array()));
+
+  foreach ($templates as $key) {
+    if (isset($items[$key])) {
+      $items[$key] += array('preprocess functions' => array());
+      $items[$key]['preprocess functions'][] = 'content_profile_template_preprocess';
+    }
+  }
+}
+
+/**
+ * Adds $content_profile variable if we can find a $uid.
+ */
+function content_profile_template_preprocess(&$variables, $hook) {
   // Search the uid
   foreach (array('account_id', 'uid', 'account', 'node', 'comment', 'user') as $name) {
     if (isset($variables[$name])) {
@@ -556,7 +579,6 @@ function content_profile_preprocess(&$variables, $hook) {
     }
   }
 }
-
 
 /**
  * Implementation of hook_simpletest().
