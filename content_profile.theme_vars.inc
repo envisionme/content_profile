@@ -72,7 +72,7 @@ class content_profile_theme_variables {
    *   The variable or FALSE if there has been no profile created yet.
    */
   function get_variable($type, $name) {
-    if ($vars = $this->get_vars($type)) {
+    if ($vars = $this->get_variables($type)) {
       return $vars[$name];
     }
     return FALSE;
