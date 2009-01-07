@@ -47,6 +47,9 @@ Hints:
    to the public, you need a module that allows configuring more fine grained access control
    permissions, e.g. the module Content Access (http://drupal.org/project/content_access)
    allows you to that.
+   
+ * There is also rules integration which is useful for customizing the behaviour of the
+   module. See below for more.
 
 
 
@@ -109,3 +112,21 @@ E.g. you may add:
 
 Where 'my_template' has to be the key of your template's entry in the theme_registry (hook_theme()).
 
+
+
+Rules integration
+------------------
+
+There is some integration to the rules module (http://drupal.org/project/rules), which offers
+a condition to check whether a user has already created a profile of a certain type. Then it
+offers an action for loading the content profile of a user, which makes it available to token
+replacements as well as to all other existing rules actions which deal with content.
+
+So this integration allows one to build some profile related rules with the rules module. As
+example the module ships with one deactivated default rule:
+
+  "Redirect to profile creation page, if users have no profile."
+  
+If you activate it at the rules "Triggered rules" page, it's going to be evaluated when a user
+logs in. Of course you can also alter the default rule and customize it so that it fits your needs,
+e.g. you could remove the redirect action so that only a message is displayed.
