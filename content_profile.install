@@ -120,3 +120,20 @@ function content_profile_update_6003() {
   }
   return $ret;
 }
+
+/**
+ * Due to an old bug it may be that the $settings of a content type
+ * are '0'. As it should be an array this generates errors.
+ * This update fixes up those scrambled settings.
+ */
+function content_profile_update_6004() {
+  $ret = array();
+  drupal_load('module', 'content_profile');
+  foreach (node_get_types('names') as $type => $type_name) {
+    $settings = variable_get('content_profile_'. $type, array());
+    if (!is_array($settings)) {
+      content_profile_set_settings($type, array());
+    }
+  }
+  return $ret;
+}
