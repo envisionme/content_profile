@@ -466,6 +466,7 @@ function content_profile_load($type, $uid, $lang = NULL) {
   }
 
   if (!isset($cache[$type][$uid][$lang])) {
+    $cache[$type][$uid][$lang] = FALSE;
     $params = array('type' => $type, 'uid' => $uid);
     if ($node = node_load($lang ? $params + array('language' => $lang) : $params)) {
       $cache[$type][$uid][$lang] = $node->nid;
