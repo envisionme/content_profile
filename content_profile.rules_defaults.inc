@@ -107,12 +107,5 @@ array (
   ),
 );
 
-  return $config + array(
-    'rule_sets' => array(
-      'rules_set_1' => array(
-        'label' => 'Rule Set Example working with content',
-        'arguments' => array('node' => array('type' => 'node', 'label' => 'Content')),
-       ),
-     ),
-   );
+  return $config;
 }
