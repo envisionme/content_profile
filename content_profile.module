@@ -458,12 +458,8 @@ function content_profile_content_profile_settings() {
  * @param $lang
  *   Optional. If translation is enabled, the language of the profile to return.
  */
-function content_profile_load($type, $uid, $lang = NULL) {
+function content_profile_load($type, $uid, $lang = '') {
   static $cache = array();
-
-  if (!isset($lang)) {
-    $lang = module_exists('translation') && translation_supported_type($type) ? $GLOBALS['language']->language : '';
-  }
 
   if (!isset($cache[$type][$uid][$lang])) {
     $cache[$type][$uid][$lang] = FALSE;
@@ -475,7 +471,6 @@ function content_profile_load($type, $uid, $lang = NULL) {
   }
   return !empty($cache[$type][$uid][$lang]) ? node_load($cache[$type][$uid][$lang]) : FALSE;
 }
-
 
 /**
  * Returns an array suitable for use with drupal_render,
