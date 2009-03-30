@@ -12,7 +12,7 @@
 function content_profile_rules_condition_info() {
   return array(
     'content_profile_user_has_profile_condition' => array(
-      'label' => t('User has content_profile'),
+      'label' => t('User has content profile'),
       'arguments' => array(
         'user' => array('type' => 'user', 'label' => t('User')),
       ),
