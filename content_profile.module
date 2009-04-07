@@ -81,7 +81,13 @@ function content_profile_page_access($type, $account) {
   if ($node = content_profile_load($type, $account->uid)) {
     return node_access('update', $node);
   }
-  return node_access('create', $type);
+  // Else user may view the page when they are going to create their own profile
+  // or have permission to create it for others.
+  global $user;
+  if ($user->uid == $account->uid || user_access('administer nodes') ){
+    return node_access('create', $type);
+  }
+  return FALSE;
 }
 
 /**
