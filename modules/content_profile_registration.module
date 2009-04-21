@@ -200,7 +200,26 @@ function content_profile_registration_user_register_validate($form, &$form_state
 
     $form_state['content_profile_registration'][$type]['node'] = $node;
   }
+  // Remove our added values
+  foreach ($form['#content_profile_weights'] as $key => $weight) {
+    _content_profile_registration_remove_values($key, $form[$key], $form_state);
+  }
 }
+
+/**
+ * Recursivly removes all form values created by this element or its children.
+ */
+function _content_profile_registration_remove_values($key, $element, &$form_state) {
+  if ((isset($element['#input']) || !empty($element['#tree'])) && isset($form_state['values'][$key])) {
+    unset($form_state['values'][$key]);
+  }
+  elseif (empty($element['#input']) && empty($element['#tree'])) {
+    foreach (element_children($element) as $key) {
+      _content_profile_registration_remove_values($key, $element[$key], $form_state);
+    }
+  }
+}
+
 
 /**
  * Submits the user registration form
