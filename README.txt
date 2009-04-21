@@ -1,7 +1,9 @@
 $Id$
 
+
+-----------------------
 Content Profile Module
-------------------------
+-----------------------
 by Wolfgang Ziegler, nuppla@zites.net
 
 With this module you can build user profiles with drupal's content types.
@@ -130,3 +132,78 @@ example the module ships with one deactivated default rule:
 If you activate it at the rules "Triggered rules" page, it's going to be evaluated when a user
 logs in. Of course you can also alter the default rule and customize it so that it fits your needs,
 e.g. you could remove the redirect action so that only a message is displayed.
+
+
+
+
+
+
+
+
+
+
+
+
+---------------------------------------------
+Content Profile User Registration Integration
+----------------------------------------------
+
+There is a small extension module shipping with the main module, which allows one to enable
+registration integration per content profile. 
+
+
+This module builds upon the main content profile module. It allows to integrate
+the form of one or more content profile into the user registration page.
+
+
+Installation 
+------------
+ * Activiate the module.
+ 
+ 
+ Usage:
+--------
+ * When you edit a profile content type there will be a further tab "Content profile",
+   which provides content profile specific settings. There is now a new field group
+   called "User Registration" which allows you to enable this feature for a content profile.
+   
+ * You need not grant anonymous users access to create the content profile. If you would do so,
+   anonymous users would be able to create anonymous profiles even without registering.
+   
+ * If you use the "Content permissions" module, which comes with CCK, make sure you grant access
+   to fields that should appear for anonymous users.
+   
+ * The weight of the profile (configurable at the content profile settings) controls the position
+   of the form elements on the registration page. 
+
+ * You may also hide some form elements at the settings. Basically it allows you to hide non-required
+   CCK fields as well as the title. If the title is hidden, it is set to the user's name.
+    
+ * For more control over the title use the "Automatic Nodetitles" module, which can be found
+   at http://drupal.org/project/auto_nodetitle. It integrates fine with this module. 
+
+ * Hiding required CCK fields is not supported, as the created content node would have empty
+   required fields afterwards, which in affect would make it impossible even for admins to edit
+   the content node.
+  
+ * So the "Hide other form elements" option allows you to hide all form elements not listed there,
+   but required CCK fields always stay.
+   
+   However, you can still hide required CCK fields by restricting anonymous access to them by using the 
+   "Content permissions" module of CCK. But be aware of this issue - maybe also restrict access for
+   other roles accordingly.
+
+ * If you want to hide the "body" field, just remove it from the content type in general at the content
+   type's settings page. Then instead of this, just create a CCK textfield, which can be hidden.  
+
+ * You can enable the registration integration for multiple profiles - however be aware that
+   shared form elements like the title only appear once and all created profile nodes get the same
+   values assigned.
+   
+ * If you want to prepopulate some other form elements, maybe hidden CCK fields you can use the rules
+   module for that. See http://drupal.org/project/rules.
+   Just configure a rule, that reacts on the creation of the content profile (event) and populates
+   your fields value (action).
+
+ * Putting file uploads on the registration form is not supported and probably won't work right.
+ 
