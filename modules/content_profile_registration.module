@@ -191,6 +191,9 @@ function content_profile_registration_user_register_validate($form, &$form_state
     $node = (object)$form_state['values'];
     $node->type = $type;
 
+    // Make sure there is no user name so we can node_validate
+    unset($node->name);
+
     if (!in_array('other', content_profile_get_settings($type, 'registration_hide'))) {
       node_validate($node);
     }
