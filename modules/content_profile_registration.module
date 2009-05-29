@@ -10,7 +10,7 @@
  * Implementation of hook_form_alter().
  */
 function content_profile_registration_form_alter(&$form, &$form_state, $form_id) {
-  if ($form_id == 'user_register' && module_exists('content')) {
+  if ($form_id == 'user_register') {
     require_once drupal_get_path('module', 'node') .'/node.pages.inc';
     $profile_types = content_profile_get_types('names', (arg(0) == 'admin' ? 'admin_user_create_use' : 'registration_use'));
 
