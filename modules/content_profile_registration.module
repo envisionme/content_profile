@@ -187,9 +187,12 @@ function content_profile_registration_alter_weights($elements) {
  * Validates the user registration form
  */
 function content_profile_registration_user_register_validate($form, &$form_state) {
+  require_once drupal_get_path('module', 'node') .'/node.pages.inc';
+
   foreach (content_profile_get_types('names', (arg(0) == 'admin' ? 'admin_user_create_use' : 'registration_use')) as $type => $typename) {
     $node = (object)$form_state['values'];
     $node->type = $type;
+    node_object_prepare($node);
 
     // Make sure there is no user name so we can node_validate
     unset($node->name);
