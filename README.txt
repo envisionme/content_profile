@@ -200,6 +200,12 @@ Installation
    shared form elements like the title only appear once and all created profile nodes get the same
    values assigned.
    
+ * For multiple registration paths for different roles, the AutoAssignRole module might help you:
+   http://drupal.org/project/autoassignrole. It comes with Content Profile Registration Integration,
+   so that you can select the profiles which should appear on each AutoAssignRole path (configurable
+   at the content profile settings). You'll need a version of AutoAssignRole released later than 
+   June 4, 2009. 
+
  * If you want to prepopulate some other form elements, maybe hidden CCK fields you can use the rules
    module for that. See http://drupal.org/project/rules.
    Just configure a rule, that reacts on the creation of the content profile (event) and populates
