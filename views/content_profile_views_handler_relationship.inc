@@ -1,4 +1,4 @@
-<?php 
+<?php
 // $Id$
 // @file
 
@@ -36,7 +36,7 @@ class content_profile_views_handler_relationship extends views_handler_relations
     $join->definition = array(
       'table' => 'node',
       'field' => 'uid',
-      'left_table' => 'users',
+      'left_table' => !empty($this->relationship) ? $this->relationship : 'users',
       'left_field' => 'uid',
       'extra' => array(
         array('field' => 'type', 'value' => $this->options['type']),
