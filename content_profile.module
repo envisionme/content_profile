@@ -376,7 +376,12 @@ function content_profile_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
       drupal_goto('node/'. $nid .'/edit', 'destination=user/'. $node->uid);
     }
   }
-  elseif ($op == 'validate' && is_content_profile($node) && user_access('administer nodes') && !isset($node->nid)) {
+  elseif ($op == 'validate' && is_content_profile($node) && user_access('administer nodes')) {
+    $form = $a3;
+    // Only validate if the user-name changed or we add a new node
+    if (!empty($node->nid) && $form['author']['name']['#default_value'] == $node->name) {
+      return;
+    }
     //check whether the selected user has already a profile
     $uid = db_result(db_query("SELECT uid FROM {users} WHERE name = '%s'", $node->name));
     if (content_profile_profile_exists($node, $uid)) {
