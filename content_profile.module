@@ -11,12 +11,17 @@
  * Implementation of hook_init().
  */
 function content_profile_init() {
-  if (module_exists('panels')) {
-    module_load_include('inc', 'content_profile', 'content_profile.panels');
-  }
   module_load_include('inc', 'content_profile', 'content_profile.theme_vars');
 }
 
+/**
+ * Implementation of hook_ctools_plugin_directory().
+ */
+function content_profile_ctools_plugin_directory($module, $plugin) {
+  if ($module == 'ctools' && $plugin == 'relationships') {
+    return 'panels/' . $plugin;
+  }
+}
 
 /**
  * Implementation of hook_menu().
