@@ -47,6 +47,7 @@ function content_profile_registration_form_alter(&$form, &$form_state, $form_id)
     $form['registration']['registration_hide'] = array(
       '#type' => 'checkboxes',
       '#title' => t('Hide form fields'),
+      '#description' => t('Hide fields from the user registration form. Required fields cannot be hidden and are not shown here.'),
       '#options' => _content_profile_registration_get_field_select($type),
       '#default_value' => content_profile_get_settings($type, 'registration_hide'),
     );
