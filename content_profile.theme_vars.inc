@@ -47,8 +47,8 @@ class content_profile_theme_variables {
    *   or FALSE if there has been no profile created yet.
    */
   function get_variables($type, $teaser = FALSE, $page = FALSE) {
-    if (!isset($this->_cache['type'][$teaser][$page])) {
-      $this->_cache['type'][$teaser][$page] = FALSE;
+    if (!isset($this->_cache[$type][$teaser][$page])) {
+      $this->_cache[$type][$teaser][$page] = FALSE;
 
       if ($node = content_profile_load($type, $this->uid)) {
         // Make sure the node is prepared for viewing
@@ -61,10 +61,10 @@ class content_profile_theme_variables {
             $function($vars, 'node');
           }
         }
-        $this->_cache['type'][$teaser][$page] = $vars;
+        $this->_cache[$type][$teaser][$page] = $vars;
       }
     }
-    return $this->_cache['type'][$teaser][$page];
+    return $this->_cache[$type][$teaser][$page];
   }
 
   /**
