@@ -183,8 +183,10 @@ function content_profile_registration_add_profile_form($type, &$form, &$form_sta
  */
 function content_profile_registration_alter_weights($elements) {
   foreach ($elements['#content_profile_weights'] as $key => $weight) {
-    $elements[$key] += array('#weight' => 0);
-    $elements[$key]['#weight'] = $weight + $elements[$key]['#weight'] / 1000;
+    if (isset($elements[$key]) && is_array($elements[$key])) {
+      $elements[$key] += array('#weight' => 0);
+      $elements[$key]['#weight'] = $weight + $elements[$key]['#weight'] / 1000;
+    }
   }
   return $elements;
 }
