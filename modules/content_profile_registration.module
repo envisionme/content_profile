@@ -173,6 +173,11 @@ function content_profile_registration_add_profile_form($type, &$form, &$form_sta
   foreach (element_children($form_add) as $key) {
     $form['#content_profile_weights'] += array($key => $weight);
   }
+
+  // Set the enctype, if necessary.
+  if (isset($node_form['#attributes']['enctype'])){
+    $form['#attributes']['enctype'] = $node_form['#attributes']['enctype'];
+  }
 }
 
 /**
