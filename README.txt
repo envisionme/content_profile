@@ -136,14 +136,6 @@ e.g. you could remove the redirect action so that only a message is displayed.
 
 
 
-
-
-
-
-
-
-
-
 ---------------------------------------------
 Content Profile User Registration Integration
 ----------------------------------------------
@@ -212,4 +204,22 @@ Installation
    your fields value (action).
 
  * Putting file uploads on the registration form is not supported and probably won't work right.
+ 
+ 
+-----------------------
+Content Profile Tokens
+-----------------------
+
+Original author: @author Ádám Lippai - Oghma ltd. (lippai.adam@oghma.hu)
+
+
+This is a small module that adds content profile tokens for textfields and number CCK fields for
+a user as well as to the 'flag friend' modules' requester and requestee.
+
+Warning: This module slows down the generation of users tokens, thus it might have some performance
+         implications for your site. Use it with caution. 
+
+Installation 
+------------
+ * Activiate the module.
  
