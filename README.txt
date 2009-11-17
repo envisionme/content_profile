@@ -151,6 +151,7 @@ the form of one or more content profile into the user registration page.
 Installation 
 ------------
  * Activiate the module.
+ * Be sure to read the usage notes below!
  
  
  Usage:
@@ -205,7 +206,12 @@ Installation
 
  * Putting file uploads on the registration form is not supported and probably won't work right.
  
+ * The CCK "Add more fields" feature is only working for users with javascript turned on in the
+   registration form. Users without javascript won't be able to add more fields. Interested developers
+   can find the related issue (in drupal itself) here: http://drupal.org/node/634984
  
+ 
+  
 -----------------------
 Content Profile Tokens
 -----------------------
