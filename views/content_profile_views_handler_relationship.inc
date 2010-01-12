@@ -6,10 +6,11 @@
  * Specialized relationship handler to adding content profiles.
  */
 class content_profile_views_handler_relationship extends views_handler_relationship {
-  function options(&$options) {
-    parent::options($options);
+  function option_definition() {
+    $options = parent::option_definition();
 
-    $options['type'] = '';
+    $options['type'] = array('default' => '');
+    return $options;
   }
 
   /**
