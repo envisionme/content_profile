@@ -489,6 +489,27 @@ function content_profile_load($type, $uid, $lang = '') {
 }
 
 /**
+ * Implementation of hook_help().
+ * 
+ * Show node submission guidelines for content profile node forms.
+ */
+function content_profile_help($path, $arg) {
+  if (preg_match('/user\/\%\/(profile|edit)\/(.*)/', $path, $matches)) {
+    foreach (content_profile_get_types('names') as $type => $typename) {
+      if ($type == $matches[2]) {
+        $node = content_profile_load($type, $arg[1]);
+        if ($node) {
+          return node_help('node/%/edit', array(1 => $node->nid));
+        }
+        else {
+          return node_help('node/add/'. $type, array('node', 'add', $type));
+        }
+      }
+    }
+  }
+}
+
+/**
  * Returns an array suitable for use with drupal_render,
  * that shows all content_profiles as configured by the admin.
  */
