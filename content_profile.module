@@ -576,6 +576,10 @@ function content_profile_theme() {
     'content_profile_display_tab_edit' => array(
       'file' => 'content_profile.theme.inc',
     ),
+    'content_profile_pageroute_empty' => array(
+      'arguments' => array('type_name' => NULL),
+      'file' => 'content_profile.pageroute.inc',
+    ),
   );
 }
 
@@ -625,4 +629,16 @@ function content_profile_simpletest() {
   // Scan through content_profile/tests directory for any .test files to tell SimpleTest module.
   $tests = file_scan_directory(drupal_get_path('module', 'content_profile') .'/tests', '\.test');
   return array_keys($tests);
+}
+
+/**
+ * Implementation of hook_pageroute_info() for Pageroute integration.
+ */
+function content_profile_pageroute_info() {
+  return array(
+    'content_profile' => array(
+      'viewprofile' => 'content_profile.pageroute',
+      'editprofile' => 'content_profile.pageroute',
+    )
+  );
 }
