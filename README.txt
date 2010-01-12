@@ -21,6 +21,19 @@ Installation
    you to mark a content type as profile.
  * When you edit a profile content type there will be a further tab "Content profile",
    which provides content profile specific settings.
+   
+
+ Warning:
+---------
+ The module uses drupal's content or "nodes" for user profiles, so the access
+ permissions applied to view the content profiles are the regular node related
+ permissions.
+ That means the "access user profiles" permission of the user module still
+ applies only to the user account pages at "user/UID" but not to content profiles,
+ which can be viewed at node/NID too. Still you can use any regular node access
+ module to restrict access to your content profiles, e.g. you may use the Content
+ Access module for that (http://drupal.org/project/content_access).
+
 
 
 Content profiles per role:
