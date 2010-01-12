@@ -468,19 +468,21 @@ function content_profile_content_profile_settings() {
  * Loads the node, like node_load but makes sure the results are cached.
  *
  * @param $type
- *   The content profile's type
+ *   The content profile's type.
  * @param $uid
- *   The profile owner's user id
+ *   The profile owner's user id.
  * @param $lang
  *   Optional. If translation is enabled, the language of the profile to return.
+ * @param $reset
+ *   Optional. If set, the cache is reset.
  */
-function content_profile_load($type, $uid, $lang = '') {
+function content_profile_load($type, $uid, $lang = '', $reset = NULL) {
   static $cache = array();
 
-  if (!isset($cache[$type][$uid][$lang])) {
+  if (!isset($cache[$type][$uid][$lang]) || $reset) {
     $cache[$type][$uid][$lang] = FALSE;
     $params = array('type' => $type, 'uid' => $uid);
-    if ($node = node_load($lang ? $params + array('language' => $lang) : $params)) {
+    if ($node = node_load($lang ? $params + array('language' => $lang) : $params, NULL, $reset)) {
       $cache[$type][$uid][$lang] = $node->nid;
     }
     return $node;
@@ -490,7 +492,7 @@ function content_profile_load($type, $uid, $lang = '') {
 
 /**
  * Implementation of hook_help().
- * 
+ *
  * Show node submission guidelines for content profile node forms.
  */
 function content_profile_help($path, $arg) {
