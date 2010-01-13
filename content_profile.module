@@ -558,7 +558,7 @@ function content_profile_show_profiles($uid) {
  * Implementation of hook_theme().
  */
 function content_profile_theme() {
-  $ret = array(
+  $return = array(
     'content_profile_display_view' => array(
       'template'  => 'content_profile-display-view',
       'arguments' => array('element' => NULL),
@@ -583,7 +583,7 @@ function content_profile_theme() {
     	'file' => 'content_profile.pageroute.inc',
     );
   }
-  return $ret;
+  return $return;
 }
 
 /**
