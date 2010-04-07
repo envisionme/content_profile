@@ -69,15 +69,17 @@ function content_profile_menu() {
  */
 function content_profile_menu_alter(&$items) {
   foreach (content_profile_get_types('names', 'edit_tab', 'sub') as $type => $type_name) {
-    $item = &$items['user/%user_category/edit/'. $type];
-    $item = array(
-      'page callback' => 'content_profile_page_edit',
-      'page arguments' => array($type, 1),
-      'access callback' => 'content_profile_page_access',
-      'access arguments' => array($type, 1),
-      'file' => 'node.pages.inc',
-      'file path' => drupal_get_path('module', 'node'),
-    ) + $item;
+    if (!empty($items['user/%user_category/edit/'. $type])) {
+      $item = &$items['user/%user_category/edit/'. $type];
+      $item = array(
+        'page callback' => 'content_profile_page_edit',
+        'page arguments' => array($type, 1),
+        'access callback' => 'content_profile_page_access',
+        'access arguments' => array($type, 1),
+        'file' => 'node.pages.inc',
+        'file path' => drupal_get_path('module', 'node'),
+      ) + $item;
+    }
   }
 }
 
