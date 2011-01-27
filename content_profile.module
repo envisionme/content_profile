@@ -585,7 +585,41 @@ function content_profile_theme() {
     	'file' => 'content_profile.pageroute.inc',
     );
   }
+  // Imagecache presets to link to user profile page.
+  if (module_exists('imagecache')) {
+    foreach (imagecache_presets() as $preset) {
+      $return['content_profile_formatter_'. $preset['presetname'] .'_userlink'] = array(
+        'arguments' => array('element' => NULL),
+        'function' => 'theme_content_profile_imagecache_formatter_userlink',
+        'file' => 'content_profile.theme.inc',
+      );
+    }
+  }
   return $return;
+}
+
+/**
+ * Implementation of hook_field_formatter_info().
+ *
+ * Imagecache formatters are named as $presetname_$style
+ * $style is used to determine how the preset should be rendered.
+ * If you are implementing custom imagecache formatters please treat _ as
+ * reserved.
+ *
+ * These presets allow linking the image to the user profile page, rather than
+ * the profile node.
+ */
+function content_profile_field_formatter_info() {
+  $formatters = array();
+  if (module_exists('imagecache')) {
+    foreach (imagecache_presets() as $preset) {
+      $formatters[$preset['presetname'] .'_userlink'] = array(
+        'label' => t('@preset image linked to user profile', array('@preset' => $preset['presetname'])),
+        'field types' => array('image', 'filefield'),
+      );
+    }
+  }
+  return $formatters;
 }
 
 /**

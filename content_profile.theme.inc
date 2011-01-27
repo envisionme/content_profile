@@ -74,6 +74,29 @@ function theme_content_profile_display_tab_edit($node) {
 }
 
 /**
+ * Imagecache formatter.
+ */
+function theme_content_profile_imagecache_formatter_userlink($element) {
+  // Inside a view $element may contain NULL data. In that case, just return.
+  if (empty($element['#item']['fid'])) {
+    return '';
+  }
+
+  // Extract the preset name from the formatter name.
+  $presetname = substr($element['#formatter'], 0, strrpos($element['#formatter'], '_'));
+  $style = 'userlink';
+
+  $item = $element['#item'];
+  $item['data']['alt'] = isset($item['data']['alt']) ? $item['data']['alt'] : '';
+  $item['data']['title'] = isset($item['data']['title']) ? $item['data']['title'] : NULL;
+
+  $imagetag = theme('imagecache', $presetname, $item['filepath'], $item['data']['alt'], $item['data']['title']);
+  $path = empty($item['uid']) ? '' : 'user/'. $item['uid'];
+  $class = "imagecache imagecache-$presetname imagecache-$style imagecache-{$element['#formatter']}";
+  return l($imagetag, $path, array('attributes' => array('class' => $class), 'html' => TRUE));
+}
+
+/**
  * Gets the edit path for a content_profile
  */
 function content_profile_get_edit_path($node) {
