@@ -6,13 +6,7 @@
  * Marks content types as profiles.
  */
 
-
-/**
- * Implementation of hook_init().
- */
-function content_profile_init() {
-  module_load_include('inc', 'content_profile', 'content_profile.theme_vars');
-}
+require_once dirname(__FILE__) . '/content_profile.theme_vars.inc';
 
 /**
  * Implementation of hook_ctools_plugin_directory().
