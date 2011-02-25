@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 /**
  * @file content-profile-display-view.tpl.php

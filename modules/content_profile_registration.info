@@ -1,4 +1,3 @@
-; $Id$
 name = "Content Profile User Registration"
 description = "Enable content profile features during user registration"
 package = "Content Profile"
