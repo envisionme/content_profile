@@ -8,7 +8,7 @@
 /**
  * Implementation of hook_form_alter().
  */
-function content_profile_registration_form_alter(&$form, &$form_state, $form_id) {
+function content_profile_registration_form_alter(&$form, $form_state, $form_id) {
   if ($form_id == 'user_register') {
     require_once drupal_get_path('module', 'node') .'/node.pages.inc';
 
@@ -91,7 +91,7 @@ function _content_profile_registration_get_field_select($type) {
     }
   }
   $return['other'] = t('Other form elements (except for required CCK fields)');
-  
+
   return $return;
 }
 
@@ -144,20 +144,22 @@ function content_profile_registration_add_profile_form($type, &$form, &$form_sta
   foreach (content_profile_get_settings($type, 'registration_hide') as $field_name) {
     if (module_exists('fieldgroup') && ($group_name = _fieldgroup_field_get_group($type, $field_name))) {
       unset($form_add[$group_name][$field_name]);
-      if (count(element_children($form_add[$group_name])) == 0) {
-        unset($form_add[$group_name]);
+      if (isset($form_add[$group_name])) {
+        if (count(element_children($form_add[$group_name])) == 0) {
+          unset($form_add[$group_name]);
+        }
       }
     }
     else {
       unset($form_add[$field_name]);
     }
   }
-  
+
   // Add in the new form elements into $form.
   $form += array('#field_info' => array());
   $form['#field_info'] += $node_form['#field_info'];
   $form += $form_add;
-  
+
   // Add in further callbacks needed, if not yet done.
   if (!isset($form['#content_profile_weights'])) {
     $form['#submit'][] = 'content_profile_registration_user_register_submit';
